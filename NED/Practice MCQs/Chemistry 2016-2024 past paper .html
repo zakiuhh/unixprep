@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NED Chemistry Past Papers — Practice Quiz</title>
+<style>
+  :root{
+    --bg:#0f1419;
+    --card:#161d27;
+    --accent:#2dd4bf;
+    --accent2:#f4b942;
+    --text:#e6edf3;
+    --muted:#8b98a5;
+    --correct:#22c55e;
+    --wrong:#ef4444;
+    --border:#26303b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 12px 60px;
+  }
+  .wrap{max-width:800px;margin:0 auto;}
+  header{
+    text-align:center;
+    margin-bottom:24px;
+  }
+  header h1{
+    font-size:1.5rem;
+    margin:0 0 6px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  header p{color:var(--muted);margin:0;font-size:0.9rem;}
+
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:20px;
+  }
+  select, button{
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--border);
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:0.9rem;
+    cursor:pointer;
+  }
+  button.primary{
+    background: var(--accent);
+    color:#04231e;
+    font-weight:600;
+    border:none;
+  }
+  button.primary:hover{opacity:0.9;}
+
+  .progress-bar{
+    height:8px;
+    background:var(--card);
+    border-radius:6px;
+    overflow:hidden;
+    margin-bottom:20px;
+    border:1px solid var(--border);
+  }
+  .progress-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width:0%;
+    transition: width 0.3s;
+  }
+
+  .score-banner{
+    display:none;
+    text-align:center;
+    padding:20px;
+    background:var(--card);
+    border-radius:12px;
+    border:1px solid var(--border);
+    margin-bottom:20px;
+  }
+  .score-banner h2{margin:0 0 8px;font-size:2rem;color:var(--accent2);}
+  .score-banner p{margin:0;color:var(--muted);}
+
+  .q-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:14px;
+  }
+  .q-meta{
+    font-size:0.72rem;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin-bottom:6px;
+  }
+  .q-text{
+    font-size:1rem;
+    font-weight:600;
+    margin-bottom:12px;
+    line-height:1.4;
+  }
+  .opt{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:#1d2733;
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 14px;
+    border-radius:8px;
+    margin-bottom:8px;
+    cursor:pointer;
+    font-size:0.92rem;
+    transition: all 0.15s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.selected{border-color:var(--accent2);background:#2a2515;}
+  .opt.correct{background:rgba(34,197,94,0.15);border-color:var(--correct);}
+  .opt.wrong{background:rgba(239,68,68,0.15);border-color:var(--wrong);}
+  .opt.disabled{cursor:default;}
+  .opt .tag{float:right;font-size:0.75rem;color:var(--muted);}
+
+  .flag{
+    font-size:0.72rem;
+    color:var(--accent2);
+    margin-top:6px;
+  }
+
+  footer{
+    text-align:center;
+    margin-top:24px;
+  }
+  .hidden{display:none;}
+  .section-divider{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.8rem;
+    margin:26px 0 14px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>NED Chemistry Past Papers Quiz</h1>
+    <p id="subtitle">Loading questions…</p>
+  </header>
+
+  <div class="controls">
+    <select id="paperFilter"></select>
+    <button class="primary" id="startBtn">Start / Restart</button>
+    <button id="submitBtn">Submit &amp; Show Score</button>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="score-banner" id="scoreBanner">
+    <h2 id="scoreText">0 / 0</h2>
+    <p id="scoreSub">Correct answers</p>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <footer>
+    <button class="primary" id="submitBtn2">Submit &amp; Show Score</button>
+  </footer>
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// QUESTION DATA
+// Structure: { paper: "name", q: "question text", options:[..4..], correct: index(0-3), note: optional flag }
+// ---------------------------------------------------------------
+const DATA = [
+// ===================== SET: NED Chemistry 2024 (Pg 161, Q1-10) =====================
+{paper:"NED 2024 (Pg161)", q:"It is not easy to attack a nucleophile in a bulky alkyl group because:", options:["High polarity","Low reactivity","Steric hindrance","Electronegativity"], correct:2},
+{paper:"NED 2024 (Pg161)", q:"IUPAC name of Picric Acid:", options:["Phenol nitrate","2,4,6-Trinitrophenol","Trinitrobenzene","1,3,5-Trinitrophenol"], correct:1},
+{paper:"NED 2024 (Pg161)", q:"Alkyl Magnesium Halide is known as:", options:["Grignard Reagent","Magnesium salt","Alkyl halide","Organometallic compound"], correct:0},
+{paper:"NED 2024 (Pg161)", q:"Which substance gives Tollen's test?", options:["Ketone","Alcohol","Ester","Aldehyde"], correct:3},
+{paper:"NED 2024 (Pg161)", q:"Vitamin B2 is also known as:", options:["Niacin","Riboflavin","Biotin","Thiamine"], correct:1},
+{paper:"NED 2024 (Pg161)", q:"Absolute alcohol contains ___ % water:", options:["10%","0%","5%","50%"], correct:1},
+{paper:"NED 2024 (Pg161)", q:"Alkyl halide reacts with aqueous KOH to give:", options:["Ether","Aldehyde","Alcohol","Alkene"], correct:2},
+{paper:"NED 2024 (Pg161)", q:"Elements in similar groups have the same number of:", options:["Neutrons","Valence electrons","Protons","Energy levels"], correct:1},
+{paper:"NED 2024 (Pg161)", q:"ΔH = ΔH1 + ΔH2 + … is the equation of:", options:["Boyle's Law","Charles's Law","Avogadro's Law","Hess's Law"], correct:3},
+{paper:"NED 2024 (Pg161)", q:"How many isomers of C6H14 exist?", options:["5","3","7","4"], correct:0},
+
+// ===================== SET: NED 2022 (Pg149, Q1-15) =====================
+{paper:"NED 2022 (Pg149)", q:"The Hydrogenation of Alkene Produces ___", options:["Alkene","Alkyne","Alkane","All of These"], correct:2},
+{paper:"NED 2022 (Pg149)", q:"Which of the Following is a Vegetable Fiber?", options:["Terylene","Cotton","Silk","Rayon"], correct:1},
+{paper:"NED 2022 (Pg149)", q:"Addition of HCN is an Example of ___", options:["Electrophilic","Nucleophilic","Simple","Both a and b"], correct:1},
+{paper:"NED 2022 (Pg149)", q:"Which of the Following is an example of Vitamin B2?", options:["Riboflavin","Pyridoxin","Niacin","Menadione"], correct:0},
+{paper:"NED 2022 (Pg149)", q:"Most Abundant and Important Steroid is ___", options:["Cholesterol","Niacin","Riboflavin","All of These"], correct:0},
+{paper:"NED 2022 (Pg149)", q:"The Number of Pi Electron is ___ in Benzene.", options:["3","5","6","12"], correct:2},
+{paper:"NED 2022 (Pg149)", q:"Vander Wall forces are present in which type of Crystals?", options:["Ionic","Molecular","Covalent","Metallic"], correct:1},
+{paper:"NED 2022 (Pg149)", q:"Hydrolysis of Grignard Reagent Produces:", options:["Alkane","Alkene","Alkyne","Longer Alkane"], correct:0},
+{paper:"NED 2022 (Pg149)", q:"Another name of Picric Acid is ___", options:["Adipic Acid","2,4,6 Trinitrotoluene","2,4,6 Trinitrophenol","2,4,5 Trinitrotoluene"], correct:2, note:"Original page highlighted 'b' — chemically Picric Acid = 2,4,6-Trinitrophenol, please verify with your copy."},
+{paper:"NED 2022 (Pg149)", q:"The Bond Between HCl is ___", options:["Covalent","Ionic","Non-Polar Covalent","Polar Covalent"], correct:3},
+{paper:"NED 2022 (Pg149)", q:"Elasticity of Plastic Increases by using ___", options:["Ether","Ester","Aldehyde","Magnesium"], correct:3, note:"Please double check this one against original — marking looked slightly ambiguous."},
+{paper:"NED 2022 (Pg149)", q:"The Valency of Interstitial Hydrides is ___", options:["1","-1","+1","0"], correct:0},
+{paper:"NED 2022 (Pg149)", q:"HNO3 act as a ___", options:["Dehydrating Agent","Oxidizing Agent","Reducing Agent","Sulphonating Agent"], correct:1},
+{paper:"NED 2022 (Pg149)", q:"Equal Number of Molecules of Different gases at Same Temperature and Pressure occupies same volume is the statement of ___", options:["Gay Lussac Law","Avogadro Law","Anti-Boyles Law","None of These"], correct:1},
+{paper:"NED 2022 (Pg149)", q:"Formula of Hypochlorous Acid is ___", options:["HClO4","HCl","HOCl","All of These"], correct:2},
+
+// ===================== SET: NED Past Papers (Pg161/163, Q11-32) =====================
+{paper:"NED Past Papers (Pg161-163)", q:"The rate of reaction is independent of:", options:["Temperature","Surface tension","Concentration","Catalyst"], correct:1},
+{paper:"NED Past Papers (Pg161-163)", q:"The catalyst that increases the rate of reaction is called:", options:["Inhibitor","Enzyme","Positive catalyst","Negative catalyst"], correct:2},
+{paper:"NED Past Papers (Pg161-163)", q:"The woody raw material used for paper and pulp manufacturing is:", options:["Bagasse","Cotton","Bamboo","Pine"], correct:0},
+{paper:"NED Past Papers (Pg161-163)", q:"A Muslim chemist used to transform gold through the process of:", options:["Smelting","Refining","Alloying","Electrolysis"], correct:1},
+{paper:"NED Past Papers (Pg161-163)", q:"Which element is ionic?", options:["KCl","CH4","NH3","CO2"], correct:0},
+{paper:"NED Past Papers (Pg161-163)", q:"Sodium Hydroxide is also called:", options:["Lime","Baking Soda","Washing Soda","Caustic Soda"], correct:3},
+{paper:"NED Past Papers (Pg161-163)", q:"Aluminium nitrate and Aluminum powder are mixed to form:", options:["Ammonal","Aluminum oxide","Alumina","Nitrate salt"], correct:0},
+{paper:"NED Past Papers (Pg161-163)", q:"Aldehydes and Ketones are obtained by catalytic oxidation of:", options:["Alcohols","Ethers","Alkyls","Alkenes"], correct:0},
+{paper:"NED Past Papers (Pg161-163)", q:"Alcohols is what kind of fiber? (Asbestos type)", options:["Alcohols","Synthetic","Mineral","Vegetable"], correct:2, note:"Faded/rotated text — verify exact wording with original."},
+{paper:"NED Past Papers (Pg161-163)", q:"Fat and oil contain which group?", options:["Ketone","Ester","Vegetable","Ether"], correct:1},
+{paper:"NED Past Papers (Pg161-163)", q:"Acetic acid is converted into methane by:", options:["Decarboxylation","Reduction","Oxidation","Hydrolysis"], correct:0},
+{paper:"NED Past Papers (Pg161-163)", q:"Group IIIA elements show covalency due to:", options:["High electronegativity","Large ionization energy","Small atomic size","Low electron affinity"], correct:1},
+{paper:"NED Past Papers (Pg161-163)", q:"Which element belongs to the 3rd period?", options:["Na","Cl","Si (Silicon)","Mg"], correct:2, note:"Text was rotated/unclear — please verify actual question wording."},
+{paper:"NED Past Papers (Pg161-163)", q:"Bayer's Process is used for the purification of:", options:["Snelting","Chalcocite","Bauxite","Gibbsite"], correct:2},
+{paper:"NED Past Papers (Pg161-163)", q:"H2S is a good:", options:["Catalyst","Base","Oxidizing agent","Reducing agent"], correct:3},
+{paper:"NED Past Papers (Pg161-163)", q:"Group VIIA elements are called:", options:["Halogens","Alkali metals","Noble gases","Transition metals"], correct:0},
+{paper:"NED Past Papers (Pg161-163)", q:"Non-metallic compounds are present in group:", options:["IV-A","V-A","III-A","II-A"], correct:0, note:"Rotated text — please verify with original."},
+{paper:"NED Past Papers (Pg161-163)", q:"The end product of Tollen's Reagent is called:", options:["Gas evolution","Yellow ppt","Silver mirror","Black precipitate"], correct:2},
+{paper:"NED Past Papers (Pg161-163)", q:"Which statement is wrong for the chlorination of methane?", options:["It is Photochemical reaction","It is an addition reaction","It is a substitution reaction","Neither Endothermic nor exothermic"], correct:1},
+{paper:"NED Past Papers (Pg161-163)", q:"Kipp's apparatus is used for making:", options:["N2","H2S","CO2","O2"], correct:1},
+{paper:"NED Past Papers (Pg161-163)", q:"All noble gases fulfil the octet rule except:", options:["Ne","He","Ar","Kr"], correct:1},
+{paper:"NED Past Papers (Pg161-163)", q:"Force applied on a container and its volume is reduced to half then its temperature would:", options:["Increase","Decrease","Remains same","None Of these"], correct:2},
+
+// ===================== SET: NED Chemistry 2024 (Pg164/165, Q33-52) =====================
+{paper:"NED 2024 (Pg164-165)", q:"The minimum energy required for an effective collision is called:", options:["Activation energy","Kinetic energy","Bond energy","Potential energy"], correct:0},
+{paper:"NED 2024 (Pg164-165)", q:"Which mechanism does polymerization by addition follow?", options:["Addition polymerization","Substitution reaction","Condensation polymerization","Oxidation"], correct:0},
+{paper:"NED 2024 (Pg164-165)", q:"Aldehydes & Ketones:", options:["Oxidize to carboxylic acids","Bond energy","Contain carbonyl groups","Bond energy"], correct:2, note:"Please verify — image was overlapped by watermark."},
+{paper:"NED 2024 (Pg164-165)", q:"Which one is a polar molecule?", options:["CH4","CO2","N2","HCl"], correct:3},
+{paper:"NED 2024 (Pg164-165)", q:"Glucose & Fructose are:", options:["Optical isomers","Functional group isomers","Structural isomers","Geometric isomers"], correct:1},
+{paper:"NED 2024 (Pg164-165)", q:"Evaporation of water is a:", options:["Optical process","Cooling process","Heating process","Structural isomers"], correct:1},
+{paper:"NED 2024 (Pg164-165)", q:"Tendency of an atom to attract shared electrons is:", options:["Electron affinity","Ionization energy","Electronegativity","Neutral process"], correct:2},
+{paper:"NED 2024 (Pg164-165)", q:"Rutherford's model did not account for atomic stability because:", options:["It did not account for atomic stability","It ignored protons","It lacked neutrons","Atomic radius"], correct:0},
+{paper:"NED 2024 (Pg164-165)", q:"EDTA is an example of:", options:["Bidentate ligand","Monodentate ligand","Electron affinity","Chelating agent"], correct:3},
+{paper:"NED 2024 (Pg164-165)", q:"The chemical formula of heavy water is:", options:["H2O","D2O","T2O","Chelating agent"], correct:1},
+{paper:"NED 2024 (Pg164-165)", q:"If force is applied to a gas container and volume is halved, the temperature would be:", options:["Unchanged","Doubled","Halved","Tripled"], correct:1},
+{paper:"NED 2024 (Pg164-165)", q:"Kipp's apparatus is used for making:", options:["N2","H2S","CO2","O2"], correct:1},
+{paper:"NED 2024 (Pg164-165)", q:"Aqua Regia produces:", options:["Aurum Chloride","Auric Chloride","Argon Tri Chloride","White ppt"], correct:1},
+{paper:"NED 2024 (Pg164-165)", q:"What is the end product of Tollen's Reagent?", options:["Yellow ppt","Silver mirror","Brown ppt","White ppt"], correct:1},
+{paper:"NED 2024 (Pg164-165)", q:"Nitrogen molecule is more stable due to:", options:["Super Phosphate","Phosphorous Nitrate","Calcium Phosphate","Bond energy"], correct:0, note:"Overlapping watermark made this row hard to read; verify with original."},
+{paper:"NED 2024 (Pg164-165)", q:"Which is a noble gas with weakest Vander Wall Force?", options:["He","Ar","Both A and B","Xe"], correct:0},
+{paper:"NED 2024 (Pg164-165)", q:"Ethyl alcohol on distilled with excess of Cl2 and Ca(OH)2, the final product is:", options:["Rectified Spirit","Denatured Alcohol","Methylated Spirit","Absolute Alcohol"], correct:3},
+{paper:"NED 2024 (Pg164-165)", q:"Chloroprene has two:", options:["Chain Isomers","Position Isomers","Functional Group Isomers","Metamers"], correct:1},
+{paper:"NED 2024 (Pg164-165)", q:"Grignard's Reagent is active due to presence of:", options:["Mg-I","Lewis Base","Arrhenius Acid","All of these"], correct:3},
+{paper:"NED 2024 (Pg164-165)", q:"Metal used for galvanizing iron is:", options:["Fe","Zn","Cu","Mg"], correct:1},
+
+// ===================== SET: NED Chemistry 2024 (Pg164/165 continued, Q41-63) =====================
+{paper:"NED 2024 (Pg164-165B)", q:"Which is the most powerful reducing agent?", options:["Br2","He","Li","Ga"], correct:2},
+{paper:"NED 2024 (Pg164-165B)", q:"In Aluminium, corrosion is not produced due to formation of:", options:["Oxide layer","Carbohydrate","Oil","All of these"], correct:0},
+{paper:"NED 2024 (Pg164-165B)", q:"Polyhydroxy Ketone + Aldehyde are:", options:["Proteins","Vitamins","Carbohydrates","Oils"], correct:2},
+{paper:"NED 2024 (Pg164-165B)", q:"Woody formula of Magnesium Bromide:", options:["MgBr","MgBr2","MgBn","MgBn2"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"Reaction of alcohol with acetic acid gives:", options:["Ether","Ester","Alcohol","Aldehyde"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"Functional group of Vitamins are:", options:["Ether","Super Phosphate","Reducing Agent","Both A and B"], correct:3, note:"Watermark overlap — verify wording with original."},
+{paper:"NED 2024 (Pg164-165B)", q:"Which is a noble gas with weakest Vander Wall Force?", options:["He","Ar","Xe","Kr"], correct:0},
+{paper:"NED 2024 (Pg164-165B)", q:"Nitrogen and phosphorous is given to plants by:", options:["Phosphoric Nitrate","Super Phosphate","Calcium Phosphate","None"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"Bauxite is purified by:", options:["Bayer Process","Hall Process","Deacon Process","None"], correct:0},
+{paper:"NED 2024 (Pg164-165B)", q:"What is the end product of Toller's (Tollen's) Reagent?", options:["Yellow ppt","Silver mirror","Brown ppt","White ppt"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"Aqua Regia produces:", options:["Aurum Chloride","Auric Chloride","White ppt","Brown ppt"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"Kipp's apparatus is used for making:", options:["N2","H2S","Triple Bond","Half filled potential"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"Cancer is treated by using:", options:["Co-60","Radioactive Iodine","Half-filled potential","None"], correct:0},
+{paper:"NED 2024 (Pg164-165B)", q:"The green colour of glass is due to the presence of:", options:["MnO2","CoO","CuO / Cr2O3 (Chromium oxide)","U-238"], correct:2},
+{paper:"NED 2024 (Pg164-165B)", q:"Which isotope is used in cancer treatment?", options:["Mo-98","Co-60","U-238","I-131"], correct:3, note:"Cross-check numbering with your copy — this and Q48 may reference same source table."},
+{paper:"NED 2024 (Pg164-165B)", q:"Weakest Vander Wall force is between:", options:["6 times","9 times","3 times","12 times"], correct:0, note:"This question's context (likely about intermolecular forces at varying distance) is unclear from photo — verify with original."},
+{paper:"NED 2024 (Pg164-165B)", q:"Aqua Regia is a mixture of:", options:["HNO3 + HCl","CO2 + H2O","HCl + H2O","Both A and B"], correct:0},
+{paper:"NED 2024 (Pg164-165B)", q:"Which one is a polar molecule?", options:["Vinyl chloride","Phenol & Medanal","Ethene & Propene","Styrene & Butadiene"], correct:1, note:"Watermark obstructed part of this question."},
+{paper:"NED 2024 (Pg164-165B)", q:"The formula of magnesium bromide is:", options:["MgBr","MgBr2","MgBn","MgBn2"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"The bond found in NH3 is:", options:["Ionic","Covalent","Double Covalent Bond","Single Covalent Bond"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"Na reacts more vigorously with water than Li because:", options:["It has more electrons","It is more electropositive than Li","It has a higher atomic mass","It is less dense"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"In the 2nd period from left to right, which decreases?", options:["Metallic character","Ionization energy","Electronegativity","Atomic radius"], correct:0},
+{paper:"NED 2024 (Pg164-165B)", q:"The chemical formula of washing soda is:", options:["NaOH","Na2CO3","NaHCO3","NaCl"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"The formula of magnesium bromide (repeat check) is:", options:["MgBr","MgBr2","MgBn","MgBn2"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"The coating of zinc is called:", options:["Rusting","Electroplating","Galvanization","Anodizing"], correct:2},
+{paper:"NED 2024 (Pg164-165B)", q:"Alcohols react with Grignard's reagent to form:", options:["Alkene","Alkyne","Alkane","Ether"], correct:2},
+{paper:"NED 2024 (Pg164-165B)", q:"C6H12O6 is the formula of:", options:["Sucrose","Fructose only","Both (Glucose & Fructose)","Glucose only"], correct:2},
+{paper:"NED 2024 (Pg164-165B)", q:"All noble gases fulfill the octet rule except:", options:["He (Helium)","Ne","Ar","Kr"], correct:0},
+{paper:"NED 2024 (Pg164-165B)", q:"Ga belongs to which family?", options:["Boron family","Synthetic","Nitrogen family","Carbon family"], correct:0},
+{paper:"NED 2024 (Pg164-165B)", q:"Milk sugar is:", options:["Glucose","Lactose","Sucrose","Fructose"], correct:1},
+{paper:"NED 2024 (Pg164-165B)", q:"Monomers of Bakelite are:", options:["Formaldehyde & Phenol","Formaldehyde only","Phenol only","Ethylene"], correct:0},
+
+// ===================== SET: NED Chemistry 2024 (Pg168-169) =====================
+{paper:"NED 2024 (Pg168-169)", q:"Benzene is purified by:", options:["Bayer's process","Hall process","Smelting","Electrolysis"], correct:0},
+{paper:"NED 2024 (Pg168-169)", q:"Na molecule is more stable due to:", options:["Ionic bond","Double bond","Triple bond","Single bond"], correct:2, note:"Watermark overlap — please verify (may refer to N2 not Na)."},
+{paper:"NED 2024 (Pg168-169)", q:"Hydrocarbon compounds are oxidized to form:", options:["CO2 + H2O","CH4 + O2","CO + H2O","Addition"], correct:0},
+{paper:"NED 2024 (Pg168-169)", q:"Benzene performs what kind of reactions?", options:["Oxidation","Addition","Electrophilic substitution","Reduction"], correct:2},
+{paper:"NED 2024 (Pg168-169)", q:"The formula of magnesium bromide is:", options:["MgBr","MgBr2","MgBn","MgBn2"], correct:1},
+{paper:"NED 2024 (Pg168-169)", q:"The bond found in NH3 is:", options:["Ionic","Covalent","Single bond","Double bond"], correct:1},
+{paper:"NED 2024 (Pg168-169)", q:"Vinyl chloride, Styrene & Butadiene are:", options:["Ethene & Propene","Phenol & Methanal","Monomers used in addition polymerization","None"], correct:2, note:"Photo garbled here; please verify wording."},
+{paper:"NED 2024 (Pg168-169)", q:"Which one has a higher atomic mass than Li, causing it to react more vigorously with water?", options:["Na (it is more electropositive than Li)","Electronegativity","Ionization energy","Atomic radius"], correct:0},
+{paper:"NED 2024 (Pg168-169)", q:"The hybridization of carbon in CF4 is:", options:["sp","sp2","sp3","dsp3"], correct:2},
+{paper:"NED 2024 (Pg168-169)", q:"A liquid boils when:", options:["Its temperature rises","Its vapor pressure becomes equal to atmospheric pressure","Its pressure drops","Its volume decreases"], correct:1},
+{paper:"NED 2024 (Pg168-169)", q:"Fertilizers which contain nitrogen and phosphorous are:", options:["Urea","DAP","Ammonium sulfate","Potash"], correct:1},
+{paper:"NED 2024 (Pg168-169)", q:"Cancer is treated using:", options:["C-14","Co-60 (Cobalt-60)","I-131","U-235"], correct:1},
+{paper:"NED 2024 (Pg168-169)", q:"Molecular formula of vinegar:", options:["CH3COOH","HCOOH","C2H5OH","CH3CHO"], correct:0},
+{paper:"NED 2024 (Pg168-169)", q:"Addition of HCN is an example of:", options:["Alkene","Nucleophilic addition","Electrophilic addition","Substitution"], correct:1},
+{paper:"NED 2024 (Pg168-169)", q:"Alkyl Halide reacts with aqueous KOH to give:", options:["Ether","Aldehyde","Alcohol","Potash"], correct:2},
+{paper:"NED 2024 (Pg168-169)", q:"The chemical name of heavy water is:", options:["D2O","H2O","T2O","None"], correct:0},
+{paper:"NED 2024 (Pg168-169)", q:"Addition of HCN to Alkyl Halide reacts with aqueous KOH to give (Cyanide reaction):", options:["Nucleophilic addition","Electrophilic addition","Substitution","Elimination"], correct:0},
+{paper:"NED 2024 (Pg168-169)", q:"The formula of C-Xylene:", options:["C8H10","C6H6","C7H8","C9H12"], correct:0, note:"Formula partly cut off by watermark, please verify."},
+{paper:"NED 2024 (Pg168-169)", q:"It is not easy to attack a nucleophile in a bulky molecule because:", options:["Low reactivity","Electronegativity","High polarity","Steric hindrance"], correct:3},
+{paper:"NED 2024 (Pg168-169)", q:"Main constituents of petrol are:", options:["CH3COOH","Octane","Pentane","Heptane"], correct:1},
+{paper:"NED 2024 (Pg168-169)", q:"For complete oxidation, 1 mole of an organic compound requires 3 moles of oxygen gas. What could be the formula of the compound?", options:["CH3CHO","CH3OH","C2H5OH","CH2OH"], correct:1, note:"This is a calculation-based Q — please verify the correct option against your copy/working."},
+
+// ===================== SET: NED Chemistry 2024 (Pg168-169, Q95-116) =====================
+{paper:"NED 2024 (Pg168-169C)", q:"Alkyl Magnesium Halide is known as:", options:["Grignard reagent","Organometallic compound","Alkyl halide","Magnesium salt"], correct:0},
+{paper:"NED 2024 (Pg168-169C)", q:"Acetic acid is converted into methane by:", options:["Reduction","Decarboxylation","Organometallic compound","Hydrolysis"], correct:1},
+{paper:"NED 2024 (Pg168-169C)", q:"CH3COOH + NaOH → gives (reaction is called):", options:["H2SO4 + Na2SO4","Neutralization","Oxidation","Esterification"], correct:1, note:"Photo shows a reaction formula that's partly unclear — verify with original."},
+{paper:"NED 2024 (Pg168-169C)", q:"Grignard's reagent is active due to the presence of:", options:["Mg","Deprotonation","R only","X only"], correct:0},
+{paper:"NED 2024 (Pg168-169C)", q:"Which two compounds are mixed to form an ester?", options:["Ketone and acid","Alcohol and carboxylic acid","Aldehyde and acid","Ether and base"], correct:1},
+{paper:"NED 2024 (Pg168-169C)", q:"Water soluble vitamins are:", options:["A, K","B, C","D, K","A, D"], correct:1},
+{paper:"NED 2024 (Pg168-169C)", q:"Ligands are:", options:["Electron acceptors","Lewis base","Lewis acid","Ionic interaction"], correct:1},
+{paper:"NED 2024 (Pg168-169C)", q:"Pi bonds are formed by:", options:["Head-on overlapping","Sideways overlapping","Ionic interaction","Hydrogen bonding"], correct:1},
+{paper:"NED 2024 (Pg168-169C)", q:"Grignard's reagent is active due to the presence of:", options:["Keto and acid","Alcohol and base","All of these (R, Mg, X)","Ether and base"], correct:2},
+{paper:"NED 2024 (Pg168-169C)", q:"Which two compounds are mixed to form an ether?", options:["Alcohol and carboxylic acid","Aldehyde and base","Ether and base","All of these"], correct:3, note:"This item overlaps with an earlier one; please verify exact original wording."},
+{paper:"NED 2024 (Pg168-169C)", q:"Alkyl Magnesium Halide is known as (repeat):", options:["Mg","R only","X only","Grignard Reagent"], correct:3},
+{paper:"NED 2024 (Pg168-169C)", q:"A component has 7 electrons in valence shell in ground state. What is its perfect configuration?", options:["3s2 3p5","3s1 3p6","4s2 4p5","3d2 4p3"], correct:0},
+{paper:"NED 2024 (Pg168-169C)", q:"Hydrogen is best:", options:["Both an oxidizing and reducing agent","Oxidizing agent only","Reducing agent only","Neither"], correct:0},
+{paper:"NED 2024 (Pg168-169C)", q:"At low pressure and high temperature, which gas behaves as an ideal gas?", options:["He","Ne","Ar","Kr"], correct:0},
+{paper:"NED 2024 (Pg168-169C)", q:"Which is a stable gas with the weakest van der Waals forces?", options:["He","Ne","Ar","Kr"], correct:0},
+{paper:"NED 2024 (Pg168-169C)", q:"Amino acids are:", options:["Acidic only","Basic only","Amphoteric","Neutral"], correct:2},
+{paper:"NED 2024 (Pg168-169C)", q:"Which one will lose valence electron more easily?", options:["Li","Na","K","Cs"], correct:3},
+{paper:"NED 2024 (Pg168-169C)", q:"Which metal ion is used for galvanizing iron?", options:["Copper","Zinc","Aluminum","Tin"], correct:1},
+{paper:"NED 2024 (Pg168-169C)", q:"Activation energy is the:", options:["Kinetic Energy","Threshold Energy - Internal Energy","Potential Energy","Threshold Energy + Internal Energy"], correct:1},
+{paper:"NED 2024 (Pg168-169C)", q:"Ionic salt in water is present in the form of:", options:["Molecules","Kinetic Energy","Hydrated Ions","Crystals"], correct:2},
+{paper:"NED 2024 (Pg168-169C)", q:"Which group forms salt-like hydrides?", options:["IA and IIA","IVA","VA","Free Atoms"], correct:0},
+{paper:"NED 2024 (Pg168-169C)", q:"Which is the most powerful oxidizing agent?", options:["F2","Cl2","O2","H2O2"], correct:0},
+
+// ===================== SET: Extra items (Pg168 single column, Q117-122) =====================
+{paper:"NED 2024 (Pg168 extra)", q:"What is the end product of Tollen's reagent?", options:["Yellow solution","Silver mirror","Gas evolution","Black precipitate"], correct:1},
+{paper:"NED 2024 (Pg168 extra)", q:"Bauxite is purified by:", options:["Baeyer process","Electrolysis","Hall process","Smelting"], correct:0},
+{paper:"NED 2024 (Pg168 extra)", q:"N2 molecule is more stable due to:", options:["Single bond","Triple bond","Double bond","Ionic bond"], correct:1},
+{paper:"NED 2024 (Pg168 extra)", q:"Hybridization utilized by Carbon in CF4 is:", options:["sp3","sp2","sp","dsp3"], correct:0},
+{paper:"NED 2024 (Pg168 extra)", q:"Cancer is treated by using:", options:["I-131","Co-60","C-14","U-235"], correct:1},
+{paper:"NED 2024 (Pg168 extra)", q:"A liquid will boil when:", options:["Its temperature rises","Vapor pressure becomes equal to atmospheric pressure","Its pressure drops","Its volume decreases"], correct:1},
+
+// ===================== SET: NED Past Papers (Pg135, unnumbered set) =====================
+{paper:"NED Past Papers (Pg135)", q:"As the elements of period 2 are considered from left to right, they are generally in decreasing:", options:["Nonmetallic character","Electronegativity","Metallic character","Ionization energy"], correct:2},
+{paper:"NED Past Papers (Pg135)", q:"Which is inconsistent with Kinetic Molecular Theory?", options:["Gas molecules are in random straight motion","Gas molecules have negligible volume compared to volume they occupy","Collision between gas molecules leads to transfer of energy that is conserved","None of these"], correct:0, note:"Watermark obscured this row — please verify."},
+{paper:"NED Past Papers (Pg135)", q:"Bond present in Nitrogen molecule is:", options:["Double Covalent Bond","Triple Covalent Bond","Ionic Bond","Single Covalent Bond"], correct:1},
+{paper:"NED Past Papers (Pg135)", q:"Kraft process is used to prepare:", options:["Alkyl halide on treatment with KOH gives:", "Ion-dipole","Dipole-dipole","Polar Covalent"], correct:2, note:"This row was corrupted in transcription — please check original photo directly for this item."},
+{paper:"NED Past Papers (Pg135)", q:"HI is really dissolved in water due to:", options:["Ion-dipole","Dipole-dipole","Polar Covalent","H bond"], correct:0},
+{paper:"NED Past Papers (Pg135)", q:"NH3 is really dissolved in water due to:", options:["H2CO3","HI","HCl","H2SO4"], correct:2, note:"Possibly mismatched pairing — verify."},
+{paper:"NED Past Papers (Pg135)", q:"The sum of exponents of the reactants in a rate expression is:", options:["Rate of Reaction","Order of Reaction","Chemical Reaction","None of these"], correct:1},
+{paper:"NED Past Papers (Pg135)", q:"Hydrogen ion:", options:["Bare Proton","None"], correct:0},
+{paper:"NED Past Papers (Pg135)", q:"Most abundant element of IIIA group is:", options:["Boron","Cesium","Aluminium","Xenon"], correct:2},
+{paper:"NED Past Papers (Pg135)", q:"Sodium electropositive element is:", options:["Helium","Fluorine","Sodium","Calcium"], correct:2, note:"Question wording unclear from photo — verify."},
+{paper:"NED Past Papers (Pg135)", q:"Most electropositive element of IIIA group is:", options:["Helium","Fluorine","Aluminium","Calcium"], correct:2},
+{paper:"NED Past Papers (Pg135)", q:"Number of valence electrons in elements of same group of periodic table:", options:["Same","Different","Zero","Random"], correct:0},
+{paper:"NED Past Papers (Pg135)", q:"Which property is same in elements of same group of periodic table?", options:["Enzymes","Number of valence electron","Ionization potential","Electronegativity"], correct:1},
+{paper:"NED Past Papers (Pg135)", q:"Potassium Permanganate acts as:", options:["A base","An acid","Oxidizing Agent","Reducing Agent"], correct:2},
+{paper:"NED Past Papers (Pg135)", q:"Chelserol, Oxalic Acid and Progesterone are:", options:["Amino Acid","Steroids","Enzymes","Proteins"], correct:1, note:"Word 'Chelserol/Cholesterol' unclear — verify."},
+{paper:"NED Past Papers (Pg135)", q:"Alkyl halide on treatment with KOH gives:", options:["Alkene","Aldehyde","Alcohol","Both A and B"], correct:0, note:"Verify — depends on aqueous/alcoholic KOH condition."},
+{paper:"NED Past Papers (Pg135)", q:"Hydrogen from acid-like hydrides forms bonds among elements of:", options:["IA and IIA","VIIA","IA and IVA","None of these"], correct:1, note:"Row overlapped with watermark — please verify wording."},
+{paper:"NED Past Papers (Pg135)", q:"No two electrons can have the same set of four quantum numbers. This is known as:", options:["Hund's Rule","Aufbau Principle","Pauli Exclusion Principle","n+1 Rule"], correct:2},
+{paper:"NED Past Papers (Pg135)", q:"The number of elements in each lanthanide and actinide series are:", options:["18","32","14","2"], correct:2},
+{paper:"NED Past Papers (Pg135)", q:"Hydrazine is used as:", options:["Pesticide","Plant hormone","Insecticide","Fertilizer"], correct:0, note:"Wording of question unclear — verify."},
+{paper:"NED Past Papers (Pg135)", q:"Hexachlorobenzene is used as:", options:["Pesticide","Plant hormone","Insecticide","Fertilizer"], correct:2},
+{paper:"NED Past Papers (Pg135)", q:"Materials which increase mechanical strength of plastics:", options:["Plasticizer","Filler","Fertilizer","None of these"], correct:1},
+{paper:"NED Past Papers (Pg135)", q:"If force is applied on a container containing a gas and its volume is reduced to half then its temperature would:", options:["1/2","Negative","None of these","2"], correct:3, note:"This is a numeric-answer question — verify with your own gas-law working."},
+{paper:"NED Past Papers (Pg135)", q:"The measurement of absolute viscosity in different fluid because it depends on:", options:["Pressure","Volume","Temperature","No of moles"], correct:2},
+
+// ===================== SET: NED 2023 (Pg157, Q28-55) =====================
+{paper:"NED 2023 (Pg157)", q:"In Aluminium, corrosion is not produced due to formation of:", options:["Oxide layer","Carbohydrates","Oil","All of these"], correct:0},
+{paper:"NED 2023 (Pg157)", q:"Polyhydroxy Ketone + Aldehyde are:", options:["Proteins","Vitamins","Carbohydrates","Oils"], correct:2},
+{paper:"NED 2023 (Pg157)", q:"Citrus Fruit is a Source of Vitamin ___", options:["A","D","E","C"], correct:3},
+{paper:"NED 2023 (Pg157)", q:"The mixture of aluminium powder and aluminium nitrate is:", options:["Duralumin","Alum","MgBn","Ammonal"], correct:3},
+{paper:"NED 2023 (Pg157)", q:"Formula of Polyhydroxy Aldehyde is (functional group of carbohydrates):", options:["Ether","Ester","Alcohol","Aldehyde"], correct:3},
+{paper:"NED 2023 (Pg157)", q:"Reaction of alcohol with acetic acid gives:", options:["Ether","Ester","Alcohol","Aldehyde"], correct:1},
+{paper:"NED 2023 (Pg157)", q:"Elements of Group IIB are called:", options:["Alkali metals","Coinage metals","Transition metals","Rare earth metals"], correct:1},
+{paper:"NED 2023 (Pg157)", q:"Alkyl halide reacts with aqueous KOH to give:", options:["Ether","Aldehyde","Alcohol","Potash"], correct:2},
+{paper:"NED 2023 (Pg157)", q:"Ostwald's method is used in the preparation of:", options:["H2SO4","HCl","HNO3","NaNO3"], correct:2},
+{paper:"NED 2023 (Pg157)", q:"Bayer's method is used for purification of:", options:["Alum","Bauxite","Chalcocite","Gibbsite"], correct:1},
+{paper:"NED 2023 (Pg157)", q:"Reaction of aluminium powder and aluminium nitrate is given by:", options:["Ether","Alcohol","Aldehyde","Reaction with Fehling's solution"], correct:0, note:"Repeat/garbled item — please verify original."},
+{paper:"NED 2023 (Pg157)", q:"Nitrogen and phosphorous is given to plants by:", options:["Phosphoric Nitrate","Super Phosphate","Calcium Phosphate","None"], correct:1},
+{paper:"NED 2023 (Pg157)", q:"Elements from Group IB are called:", options:["Coinage metals","Transition metals","Rare earth metals","Alkali metals"], correct:0, note:"Possible duplicate of earlier item — verify."},
+{paper:"NED 2023 (Pg157)", q:"Cancer is treated by using:", options:["Co-60","I-131","U-235","C-14"], correct:0},
+{paper:"NED 2023 (Pg157)", q:"Which one is a noble gas with weakest Vander Wall force?", options:["He","Ne","Ar","Xe"], correct:0},
+{paper:"NED 2023 (Pg157)", q:"Hydrogen in best (auto redox) reaction is found in:", options:["Cannizzaro's reaction","Fehling's test","Tollen's test","Aldol condensation"], correct:0},
+{paper:"NED 2023 (Pg157)", q:"What is the end product of Tollen's Reagent?", options:["Yellow ppt","Silver mirror","Brown ppt","White ppt"], correct:1},
+{paper:"NED 2023 (Pg157)", q:"Propyl Alcohol on oxidation gives:", options:["Propionic acid","R-OH","R-CHO","R-COOH"], correct:0, note:"Overlap with another set's Q — please verify."},
+{paper:"NED 2023 (Pg157)", q:"General formula of amide:", options:["R-OH","R-C-NH2","R-CHO","R-COOH"], correct:1},
+{paper:"NED 2023 (Pg157)", q:"Which product is obtained by destructive distillation of wood?", options:["Ethanol","Formaldehyde","Methanol","Acetone"], correct:2},
+{paper:"NED 2023 (Pg157)", q:"Aqua Regia produces:", options:["Aurum Chloride","CO + H2O","CH4 + O2","C + H2O"], correct:0},
+{paper:"NED 2023 (Pg157)", q:"Which two compounds are mixed to form redox reaction in oxidation?", options:["Fehling's test","Cannizzaro's reaction","Tollen's test","Aldol condensation"], correct:0, note:"Question wording uncertain — verify with source."},
+{paper:"NED 2023 (Pg157)", q:"For complete oxidation 1 mole of an organic compound requires 3 moles of oxygen gas. What could be the formula of the compound?", options:["CH3CHO","CH3OH","C2H5OH","CH3OCH3"], correct:2, note:"Calculation-based — please verify with your own working."},
+{paper:"NED 2023 (Pg157)", q:"Main constituents of petrol is:", options:["CH3COOH","Octane","Pentane","Heptane"], correct:1},
+{paper:"NED 2023 (Pg157)", q:"The formula of C-Xylene:", options:["C8H10","C6H6","C7H8","C9H12"], correct:0, note:"Verify — text was cut off."},
+{paper:"NED 2023 (Pg157)", q:"It is not easy to attack a nucleophile in a bulky molecule because:", options:["Low reactivity","Electronegativity","High polarity","Steric hindrance"], correct:3},
+{paper:"NED 2023 (Pg157)", q:"Main constituents of petrol is (repeat):", options:["CH3(CH2)3","Octane","Pentane","Heptane"], correct:1},
+
+// ===================== SET: NED (Pg157, water soluble vitamins Q56-80) =====================
+{paper:"NED Past Papers (Pg157B)", q:"Methane is also called:", options:["Marsh Gas","LPG","Coal Gas","Natural Gas"], correct:0},
+{paper:"NED Past Papers (Pg157B)", q:"Isoamyl Alcohol is also called:", options:["Amyl Alcohol","Fusel Oil","Methyl Hydride","None"], correct:1, note:"Faded text — verify with original."},
+{paper:"NED Past Papers (Pg157B)", q:"Water soluble vitamins are:", options:["Vitamin B","Vitamin D","Both A and C","Vitamin C"], correct:2},
+{paper:"NED Past Papers (Pg157B)", q:"Lowest energy of hydration give:", options:["Can Cause Blood Cancer","Vitamin D","Both A and B","None of these"], correct:0, note:"This row seems garbled from OCR overlap — please verify original wording."},
+{paper:"NED Past Papers (Pg157B)", q:"Krypton apparatus is used to prepare:", options:["Hydrated Ion","B","RB","Re"], correct:0, note:"Unclear/garbled — verify with source."},
+{paper:"NED Past Papers (Pg157B)", q:"Potassium permanganate is:", options:["Neutral","Acidic","Basic","All of these"], correct:1},
+{paper:"NED Past Papers (Pg157B)", q:"Hybridization in carbonyl carbon is:", options:["sp2","sp3","sp","None"], correct:0},
+{paper:"NED Past Papers (Pg157B)", q:"Which is the following is a Double Salt?", options:["HI","HCl","H2CO3","KNO3"], correct:0, note:"Verify — options text unclear."},
+{paper:"NED Past Papers (Pg157B)", q:"NH3 is really dissolved in water due to formation of:", options:["Dehydrated Ion","Basic","All of these","Neutral"], correct:0, note:"Verify with original — extraction was uncertain."},
+{paper:"NED Past Papers (Pg157B)", q:"Most abundant element of IIIA group is:", options:["Boron","Aluminium","Both A and B","None"], correct:1, note:"Verify against original — potential duplicate."},
+{paper:"NED Past Papers (Pg157B)", q:"Which is the most abundant element of Group IIIA?", options:["Gallium","Boron","Aluminium","Indium"], correct:2},
+{paper:"NED Past Papers (Pg157B)", q:"Dipole Moment is represented by:", options:["μ (mu)","σ","π","δ"], correct:0},
+{paper:"NED Past Papers (Pg157B)", q:"What is the other name of Water Glass?", options:["Pyrex Glass","Sodium Silicate","Borosilicate","None of these"], correct:1},
+{paper:"NED Past Papers (Pg157B)", q:"Evaporation of Water is used in Dow's Process to ___", options:["Cool","Heat","Bromobenzene","None of these"], correct:0, note:"Verify with original — wording unclear."},
+{paper:"NED Past Papers (Pg157B)", q:"Which of the following is used as Chlorobenzene:", options:["Gaseous","Heating","Sodium silicate","Caster Glass"], correct:0, note:"Garbled from original — please check."},
+{paper:"NED Past Papers (Pg157B)", q:"Which of the following is a Double Salt?", options:["Epsom","Dolomite","Iron pyrite","Chlorobenzene"], correct:1},
+{paper:"NED Past Papers (Pg157B)", q:"Which are used in coloring of Glass:", options:["Halogens","Transition Metals","Ionic Crystals","None"], correct:1},
+{paper:"NED Past Papers (Pg157B)", q:"The Most Abundant Element of Group IIIA is:", options:["Boron","Gallium","Aluminium","Indium"], correct:2, note:"Repeat of earlier item — reconcile with your copy."},
+{paper:"NED Past Papers (Pg157B)", q:"Crystals with the strongest force of attraction are:", options:["Ionic Crystals","Molecular Crystals","Covalent Crystals","Pseudo Crystals"], correct:0},
+{paper:"NED Past Papers (Pg157B)", q:"Speed up the reaction it will:", options:["Stops the reaction","Speed up the reaction","None","Nitrous Oxide"], correct:1, note:"This row's exact wording unclear — verify with original."},
+{paper:"NED Past Papers (Pg157B)", q:"Laughing gas is called:", options:["Nitrous Oxide","Nitric Oxide","Methanol","Methane"], correct:0},
+{paper:"NED Past Papers (Pg157B)", q:"If we add catalyst to a reaction it will:", options:["Speed up the reaction","Slow down the reaction","Stops the reaction","None"], correct:0},
+{paper:"NED Past Papers (Pg157B)", q:"Vander Waal forces are higher in:", options:["IA and VIIA","IIA and IIIA","Both A and B","None"], correct:0, note:"Wording unclear — verify original."},
+{paper:"NED Past Papers (Pg157B)", q:"Ionic compound is formed between:", options:["IA and VIIA","IIA and IIIA","Both A and B","None"], correct:0},
+{paper:"NED Past Papers (Pg157B)", q:"Formula of Cryolite:", options:["Na3AlF6","Na2AlF6","Mg2AlF6","Al2F6"], correct:0},
+{paper:"NED Past Papers (Pg157B)", q:"Strongest oxidizing agent is:", options:["Cl","Br","F","I"], correct:2},
+
+// ===================== SET: NED 2021 (approx Q1-25, chemistry acids/gas laws page) =====================
+{paper:"NED 2021", q:"Lemon consist of which acid:", options:["Citric Acid","Ascorbic Acid","Gymnemic Acid","None of These"], correct:0},
+{paper:"NED 2021", q:"The energy required to remove the most loosely bound outermost electron is known as:", options:["Electron Affinity","Dunbrium Energy","Electro positivity","Ionization Energy"], correct:3, note:"Options garbled by watermark — please verify with original."},
+{paper:"NED 2021", q:"Which of the Following contains lone Pair:", options:["Ammonia","Water","Methane","Ethane"], correct:0, note:"Verify — options unclear from photo."},
+{paper:"NED 2021", q:"Particle that has same mass as that of electron but Charge is opposite:", options:["Neutron","Proton","Positron","Travel"], correct:2},
+{paper:"NED 2021", q:"The Volume of 1 mole of Gas will be ___ when Both Temperature and Pressure are halved:", options:["Increase 4 times","Remain Same","Decrease 4 times","None of these"], correct:1, note:"Please verify — this is a gas-law reasoning question, check your own calculation."},
+{paper:"NED 2021", q:"KMnO4 is Best:", options:["Reducing Agent","Oxidizing Agent","Both A and B","None of These"], correct:1},
+{paper:"NED 2021", q:"Cholesterol is Mainly Called as:", options:["Steroid","Acid","Protein","None of These"], correct:0},
+{paper:"NED 2021", q:"The Sum of Partial Pressure of gases present in a system is always equal to Total Pressure, this is Statement of:", options:["Law","Zeroth Law","Henry Law","Dalton's Law"], correct:3, note:"Options list garbled — please verify exact wording."},
+{paper:"NED 2021", q:"Percentage of Neon Vapor is 25% and that of Mercury Vapor is 75% if Total Pressure is 50 mm then Partial Pressure of Neon will be:", options:["12.5","37.5","7.2","10"], correct:0},
+{paper:"NED 2021", q:"Soda Ash is Manufactured in ___ Process:", options:["Solvay","Haber","Both","None"], correct:0},
+{paper:"NED 2021", q:"All the Noble Gases Complete their Octet Except:", options:["He","Ar","Kr","Xe"], correct:0},
+{paper:"NED 2021", q:"Absolute Alcohol contains:", options:["% Water","HS","NaCl","Both A and B"], correct:0, note:"Question likely asks water percentage — verify wording."},
+{paper:"NED 2021", q:"Kipp's Apparatus is used in making of:", options:["Alkylation","Acylation","H2S","O2"], correct:2, note:"Verify option lettering with your copy."},
+{paper:"NED 2021", q:"Addition of H2SO4 in Benzene is known as:", options:["Sulphonation","Acylation","Alkylation","None"], correct:0},
+{paper:"NED 2021", q:"Heat of Hydration is Minimum for:", options:["Li","Na","K","Cs"], correct:3, note:"Verify — Heat of hydration decreases down the group; Cs would be lowest among these."},
+
+// ===================== SET: NED 2020 (Q1-15, Page 145) =====================
+{paper:"NED 2020 (Pg145)", q:"Propyl alcohol upon oxidation gives:", options:["Propionaldehyde","Acetone","Propionic acid","Propionate methyl"], correct:0},
+{paper:"NED 2020 (Pg145)", q:"Nitrogen molecule is stable due to:", options:["Triple covalent bond","Ionic bond","Coordinate covalent bond","None of these"], correct:0},
+{paper:"NED 2020 (Pg145)", q:"From which process is ammonia prepared by ammonium chloride:", options:["Hydration","Hydrolysis","Titration","Neutralization"], correct:1},
+{paper:"NED 2020 (Pg145)", q:"Ammonal is a mixture of Al and:", options:["Al2O3","Al(OH)3","Al(NO3)3","NaAlO2"], correct:2},
+{paper:"NED 2020 (Pg145)", q:"When formaldehyde and phenol react, one of the compounds synthesized is:", options:["PVC","Polyethene","Bakelite","None of these"], correct:2},
+{paper:"NED 2020 (Pg145)", q:"Aldehyde gives auto redox reaction in one of the following reactions:", options:["Cannizzaro's reaction","Tollen's reaction","Wurtz reaction","Reaction with Fehling's solution"], correct:0},
+{paper:"NED 2020 (Pg145)", q:"The mechanism through which benzene reacts is:", options:["Electrophilic addition","Electrophilic substitution","Nucleophilic substitution","Nucleophilic addition"], correct:1},
+{paper:"NED 2020 (Pg145)", q:"Addition of HCN with carbonyl compound gives ___ reaction:", options:["Electrophilic addition","Electrophilic substitution","Nucleophilic addition","Nucleophilic substitution"], correct:2},
+{paper:"NED 2020 (Pg145)", q:"Which of the following decreases from left to right along a period?", options:["Electronegativity","Ionization potential","Metallic character","Non-metallic character"], correct:2},
+{paper:"NED 2020 (Pg145)", q:"Soda Ash is prepared by:", options:["Solvay Process","Nelson Process","Castner Kellner Process","Down's Process"], correct:0},
+{paper:"NED 2020 (Pg145)", q:"Principal Quantum Number gives:", options:["Shell of electron","Sub-Shell of electron","Orbital of electron","Spin of electron"], correct:0},
+{paper:"NED 2020 (Pg145)", q:"In which compound oxidation number of Fe is +3:", options:["FeSO4","Fe2(SO4)3","Fe2O3","Both b and c"], correct:3},
+{paper:"NED 2020 (Pg145)", q:"Molecularity of a reaction is:", options:["Zero","In whole numbers","May be in fraction","All"], correct:1},
+{paper:"NED 2020 (Pg145)", q:"Which product is obtained by destructive distillation of wood:", options:["Methanol","Methanal","Methanoic acid","None of these"], correct:0},
+{paper:"NED 2020 (Pg145)", q:"ΔH = H1 + H2 + … is the statement of:", options:["Hess's Law","Law of Thermodynamics","Both a and b","None of these"], correct:0},
+
+// ===================== SET: NED 2020 continued (unlabeled, Q16-25) =====================
+{paper:"NED 2020 (contd)", q:"When reaction occurs with:", options:["Increase in volume","Decrease in volume","No change in volume","Has no significant relation"], correct:0, note:"Original question stem was partly cut off — verify exact wording."},
+{paper:"NED 2020 (contd)", q:"No two electrons can have the same quantum numbers is the statement of:", options:["Pauli Exclusion's Principle","Hund's Rule of Maximum Multiplicity","Heisenberg's uncertainty Principle","Aufbau Principle"], correct:0},
+{paper:"NED 2020 (contd)", q:"The bleaching action of chlorine is due to the formation of:", options:["HCl","HOCl","Both","None"], correct:1},
+{paper:"NED 2020 (contd)", q:"Soap consists of:", options:["Potassium salt of long chain fatty acid","Potassium salt of alkyl or alkyl sulphonated acid","Salts of Ba and Mg","None of these"], correct:0},
+{paper:"NED 2020 (contd)", q:"Which is the best oxidizing agent considering ECS?", options:["Lithium","Sodium","Fluorine","Iodine"], correct:2},
+{paper:"NED 2020 (contd)", q:"Which halogen acid is strongest?", options:["HF","HCl","HBr","HI"], correct:3},
+{paper:"NED 2020 (contd)", q:"Which halogen acid is used to make designs on a glass?", options:["HF","HCl","HBr","HI"], correct:0},
+{paper:"NED 2020 (contd)", q:"Which noble gas has weakest intermolecular forces of attraction?", options:["He","Ne","Ar","Kr"], correct:0},
+{paper:"NED 2020 (contd)", q:"If absolute temperature of the gas is halved, pressure is also reduced to ½, then its volume:", options:["Also halved","Doubled","Remains unchanged","Decreases four times"], correct:2},
+{paper:"NED 2020 (contd)", q:"Graham's law deals with gases':", options:["Condensation","Diffusion","Expansion","Contraction"], correct:1},
+
+// ===================== SET: Page 130/140 CHEMISTRY (Q1-25) =====================
+{paper:"NED Past Papers (Pg130-140)", q:"Highest covalent character is found in:", options:["CaF2","CaCl2","CaI2","CaBr2"], correct:2},
+{paper:"NED Past Papers (Pg130-140)", q:"The Chemical formula of gypsum is:", options:["CaSO4.8H2O","CaSO4.H2O","CaSO4.2H2O","None of these"], correct:2},
+{paper:"NED Past Papers (Pg130-140)", q:"Most electronegative set of elements is:", options:["N, O, F","Ca, Sr, Ba","Na, Mg, Cl","Fe, Co, Ni"], correct:0},
+{paper:"NED Past Papers (Pg130-140)", q:"CO2H is the functional group of:", options:["Alkoxy","Carbonyl","Carboxyl","Hydroxyl"], correct:2},
+{paper:"NED Past Papers (Pg130-140)", q:"Which is not an ore of iron?", options:["Hematite","Magnetite","Limonite","Kieserite"], correct:3},
+{paper:"NED Past Papers (Pg130-140)", q:"Gold dissolves in aqua regia due to formation of halide. Point out the correct halide:", options:["AuF3","AuCl3","AuBr3","AuI3"], correct:1},
+{paper:"NED Past Papers (Pg130-140)", q:"The correct arrangement of increasing order of atomic radius among Na, K, Mg, Rb is:", options:["Mg<K<Na<Rb","Mg<Na<Rb<K","Mg<Na<K<Rb","Na<K<Rb<Mg"], correct:2},
+{paper:"NED Past Papers (Pg130-140)", q:"The ratio of rates of diffusion of CO2 and a gaseous oxide is 1.2:1. Find the molecular weight of the gaseous oxide.", options:["63.36","0.6336","30","None"], correct:2},
+{paper:"NED Past Papers (Pg130-140)", q:"Nylon 6,6 is obtained by the reaction of hexamethylenediamine with:", options:["Adipic acid","Acetic acid","Vinyl chloride","Terephthalic acid"], correct:0},
+{paper:"NED Past Papers (Pg130-140)", q:"Isopropyl alcohol on catalytic oxidation gives:", options:["Acetone","Propene","Aldehyde","None"], correct:0},
+{paper:"NED Past Papers (Pg130-140)", q:"Water is disinfected by a substance to avoid detoxification:", options:["KMnO4","Cl2","O3","Alum"], correct:3, note:"Original question wording unclear — please verify."},
+{paper:"NED Past Papers (Pg130-140)", q:"The strength of binding energy of transition element depends upon:", options:["Number of electron pair","Number of neutron","Number of unpaired electron","Number of proton"], correct:1, note:"Verify — chemically this typically depends on unpaired electrons, not neutrons; please cross-check with original highlight."},
+{paper:"NED Past Papers (Pg130-140)", q:"Catalyst used to reduce carboxylic acid to alcohol is:", options:["H2/Ni","H2/Pt","NaBH4","LiAlH4"], correct:3},
+{paper:"NED Past Papers (Pg130-140)", q:"Which of the following is an amide:", options:["(NH2)2CO","NH2CH3","C6H5NH2","N(CH3)3"], correct:0},
+{paper:"NED Past Papers (Pg130-140)", q:"The benzene molecule contains:", options:["Three double bonds","One double bond","Two double bonds","Delocalized pi-electrons"], correct:3},
+{paper:"NED Past Papers (Pg130-140)", q:"The reactivity order of alkyl halide (Fluoride, Iodide, Chloride, Bromide) with a particular alkyl halide is:", options:["Fluoride>Chloride>Bromide>Iodide","Iodide>Bromide>Chloride>Fluoride","Chloride>Bromide>Fluoride>Iodide","Bromide>Iodide>Chloride>Fluoride"], correct:1},
+{paper:"NED Past Papers (Pg130-140)", q:"Which substance has ΔH = ΔE?", options:["Solid","Liquid","Gas","Both a and b"], correct:3},
+{paper:"NED Past Papers (Pg130-140)", q:"Ethyl alcohol is converted into ethanoic acid by:", options:["Hydrogenation","Hydration","Oxidation","Fermentation"], correct:2},
+{paper:"NED Past Papers (Pg130-140)", q:"Group VIB transition elements contain:", options:["Zn, Cd, Hg","Fe, Ru, Os","Cr, Mo, W","Mn, Tc, Re"], correct:2},
+{paper:"NED Past Papers (Pg130-140)", q:"Electronic configuration of Group IIIA:", options:["1s2 2s2 2p1","1s2 2s2 2p2","1s2 2s2 2p3","1s2 2s2 2p4"], correct:0},
+{paper:"NED Past Papers (Pg130-140)", q:"Which of the following is an incomplete period?", options:["4","5","6","7"], correct:3},
+{paper:"NED Past Papers (Pg130-140)", q:"The process in which fatty acid reacts with NaOH is:", options:["Saponification","Esterification","Polymerization","Hydrogenation"], correct:0},
+{paper:"NED Past Papers (Pg130-140)", q:"Acetone reacts with HCN. The reaction is:", options:["Nucleophilic addition","Nucleophilic substitution","Electrophilic addition","Electrophilic substitution"], correct:0},
+{paper:"NED Past Papers (Pg130-140)", q:"Temporary hardness is due to Ca and Mg:", options:["Bicarbonate","Carbonate","Sulphate","Chloride"], correct:0},
+{paper:"NED Past Papers (Pg130-140)", q:"Hydrogen set free at the time of its preparation is called:", options:["Atomic Hydrogen","Molecular hydrogen","Nascent Hydrogen","All of these"], correct:2},
+
+// ===================== SET: NED 2017 (Pg137 CHEMISTRY, Q1-25) =====================
+{paper:"NED 2017 (Pg137)", q:"Which of the following is drawn when ready to lose electrons:", options:["Cl","K","Ca","Br"], correct:0, note:"Question wording partly unclear — please verify with original."},
+{paper:"NED 2017 (Pg137)", q:"Structure of water molecule is:", options:["Linear","Tetrahedral","Pyramidal","Angular"], correct:3},
+{paper:"NED 2017 (Pg137)", q:"Falling drop of mercury is spherical due to:", options:["Cellular Action","Capillary Action","Viscosity","None"], correct:1, note:"Verify — surface tension is the usual textbook answer, please double-check with original highlight."},
+{paper:"NED 2017 (Pg137)", q:"Alkyl halide reacted with KOH gives:", options:["Ether","Ethene","Alkyne","None"], correct:1, note:"Verify wording with original."},
+{paper:"NED 2017 (Pg137)", q:"Alkyl halide reacts with KOH gives:", options:["Alcohol","Ketone","Benzene","None"], correct:0, note:"Possible duplicate of nearby question — reconcile with your copy."},
+{paper:"NED 2017 (Pg137)", q:"Electron configuration of C in excited state:", options:["1s2 2s2 2p2","1s2 2s1 2p3","1s2 2s2 2p1 3s1","1s2 2s2 2p3"], correct:1, note:"Verify — image was distorted here."},
+{paper:"NED 2017 (Pg137)", q:"Ionic bond is formed by the transfer of electrons from the element of:", options:["IA,IIA with VIA,VIIA","IB,IIB with VIA,VIIA","IIIA,IIIB with VIA,VIIA","None of these"], correct:0},
+{paper:"NED 2017 (Pg137)", q:"KMnO4 is an example of:", options:["Oxidizing Agent","Reducing Agent","Both","None"], correct:0},
+{paper:"NED 2017 (Pg137)", q:"Absolute alcohol contains water:", options:["0%","5%","10%","20%"], correct:0},
+{paper:"NED 2017 (Pg137)", q:"If two protons of C overlap in a form of ___ bond:", options:["Sigma bond","Pi bond","Both","May be pi or sigma"], correct:3, note:"Verify — image cut off."},
+{paper:"NED 2017 (Pg137)", q:"1.840 gm of O2 contains ___ times heavier than element:", options:["1840","2000","40","0"], correct:2, note:"This is a numeric-calculation question — please verify with your own working."},
+{paper:"NED 2017 (Pg137)", q:"Proton is ___ times heavier than electron:", options:["1840","2000","1000","0"], correct:0},
+{paper:"NED 2017 (Pg137)", q:"6.02 x 10^23 atoms of O2 contains:", options:["16 gm of O2","32 gm of O2","8 gm of O2","1 gm of O2"], correct:0, note:"Verify — original phrasing was ambiguous."},
+{paper:"NED 2017 (Pg137)", q:"If two p-orbitals of C overlap from the element of:", options:["IB,IIB with VIA,VIIA","IA,IIA with VIA,VIIA","IIIA with VIA,VIIA","None of these"], correct:1, note:"Possibly duplicate/garbled with earlier Q — verify."},
+{paper:"NED 2017 (Pg137)", q:"KMnO4 is an example of (repeat, verify):", options:["Oxidizing agent","Reducing agent","Both","None"], correct:0},
+{paper:"NED 2017 (Pg137)", q:"Basic in nature is:", options:["Acidic","Basic","Neutral","Amphoteric"], correct:1, note:"Question stem seems cut off — verify with original."},
+{paper:"NED 2017 (Pg137)", q:"H2S is example of:", options:["Oxidizing agent","Reducing agent","Both","Neutral"], correct:1},
+{paper:"NED 2017 (Pg137)", q:"Which of the following statement about enzymes is correct:", options:["Speed up the reaction","Increase the activation energy","Both","None the above"], correct:0},
+{paper:"NED 2017 (Pg137)", q:"Which increase the strength of paints:", options:["Binder","Pigment","Stabilizer","Both"], correct:0, note:"Verify with original — could be about fillers, not paints."},
+{paper:"NED 2017 (Pg137)", q:"Relative atomic mass of C12H16 is:", options:["12","14","36","44"], correct:0, note:"Numeric-calculation Q — please verify with your own working."},
+
+// ===================== SET: NED CHEM 2016 (Pg133, Q1-14 + answer key present in image) =====================
+{paper:"NED CHEM 2016 (Pg133)", q:"Cinnabar is the ore of:", options:["Hg","Pb","Zn","Ag"], correct:0},
+{paper:"NED CHEM 2016 (Pg133)", q:"C + 2S → CS2 + ΔH = +ve is the:", options:["Endothermic","Exothermic","Neutralization","Sublimation"], correct:0},
+{paper:"NED CHEM 2016 (Pg133)", q:"Formula of Gypsum:", options:["CaSO4.½H2O","CaSO4.2H2O","CaSO4.H2O","None"], correct:1},
+{paper:"NED CHEM 2016 (Pg133)", q:"Magnesite formula is a:", options:["Mg2CO3","MgCO3","Mg(OH)2","None"], correct:1},
+{paper:"NED CHEM 2016 (Pg133)", q:"Formula of formic acid is:", options:["CH3COOH","HCOOH","H2C2O4","None"], correct:1},
+{paper:"NED CHEM 2016 (Pg133)", q:"Formula of Fehling solution:", options:["Cu(OH)2","CuO","CuCO3","None"], correct:0, note:"Verify — Fehling's solution is Copper(II) sulfate based, check original highlight."},
+{paper:"NED CHEM 2016 (Pg133)", q:"Polyethylene is a polymer of:", options:["Addition","Condensation","Both","None"], correct:0},
+{paper:"NED CHEM 2016 (Pg133)", q:"Cooling is a process of ___", options:["Expansion","Contraction","Heating","None"], correct:0},
+{paper:"NED CHEM 2016 (Pg133)", q:"Different form of crystalline structure is called:", options:["Polymorphism","Allotropy","Isomorphism","None"], correct:0},
+{paper:"NED CHEM 2016 (Pg133)", q:"Evaporation of water is ___ process:", options:["Endothermic","Exothermic","Neutralization","None"], correct:0},
+{paper:"NED CHEM 2016 (Pg133)", q:"3A + 2B → C for reversible reaction, Kc = ___", options:["Kc=[C]/[A]^3[B]^2","Kc=[C]^2/[A]^3[B]^2","Kc=[A]^3[B]^2/[C]","None of these"], correct:0},
+{paper:"NED CHEM 2016 (Pg133)", q:"Alkyl magnesium halide is ___", options:["Grignard Reagent","Alcohol","Carboxylic Acid","None"], correct:0},
+{paper:"NED CHEM 2016 (Pg133)", q:"Picric Acid is (2,4,6-trinitro phenol):", options:["2 - nitro phenol","2,4,6-trinitro phenol","HCl","None"], correct:1},
+{paper:"NED CHEM 2016 (Pg133)", q:"Oswald process is used for preparation of:", options:["HNO3","HCl","H2SO4","TNT"], correct:0},
+
+// ===================== SET: NED Past Papers Pg133 continued (Q15-25) =====================
+{paper:"NED Past Papers (Pg133 contd)", q:"Polyhydroxy ketone & Aldehyde are:", options:["Carbohydrate","Amino Acid","Protein","Lipids"], correct:0},
+{paper:"NED Past Papers (Pg133 contd)", q:"In Aluminium corrosion is not proceed due to formation of ___ layer:", options:["Basic solution","Al2O3","AlCl3","None"], correct:1, note:"Verify — text overlapped with 'buffer solution' option earlier in image; please double check exact option set."},
+{paper:"NED Past Papers (Pg133 contd)", q:"A solution tends to maintain pH with small amount of acid and bases is:", options:["Buffer solution","Acidic Solution","Basic Solution","Neutral Solution"], correct:0},
+{paper:"NED Past Papers (Pg133 contd)", q:"1s2 2s2 2p6 3s2 3p4 is the configuration of:", options:["Nitrogen","Oxygen","Carbon","Sulphur"], correct:3},
+{paper:"NED Past Papers (Pg133 contd)", q:"Graham's Law is valid for ___", options:["Gases diffusion","Repulsion molecule","Attraction molecule","None"], correct:0},
+{paper:"NED Past Papers (Pg133 contd)", q:"When a fine hole glass tube is immersed in the water level inside the tube increases it is said to be ___", options:["Capillary rise action","Vapor pressure","Viscosity","None"], correct:0},
+{paper:"NED Past Papers (Pg133 contd)", q:"A solution tends to maintain pH with small amount of acid and bases is (repeat):", options:["Buffer solution","Acidic Solution","Basic Solution","Neutral Solution"], correct:0},
+{paper:"NED Past Papers (Pg133 contd)", q:"ΔH = ΔH1 + ΔH2 + …. is the statement of:", options:["Hess's Law","Rate Law","Equilibrium law","None"], correct:0},
+{paper:"NED Past Papers (Pg133 contd)", q:"In a group Element has same number of ___", options:["Proton","Valence electron","Neutron","None"], correct:1},
+{paper:"NED Past Papers (Pg133 contd)", q:"Poly Ethene is made from ethylene in the reaction:", options:["Polymerization","Isomerism","Polymorphism","None"], correct:0},
+{paper:"NED Past Papers (Pg133 contd)", q:"Order of electronegativity:", options:["F<Cl<Br<I","F>Cl>Br>I","F<Cl>Br>I","F>Cl<Br>I"], correct:1},
+{paper:"NED Past Papers (Pg133 contd)", q:"The group of p-block which don't contain any metallic element is ___", options:["VII-A","VA","F>Cl>Br>I","Both a and b"], correct:0, note:"Options list appears garbled/duplicated — please verify with original."},
+];
+
+// ---------------------------------------------------------------
+let userAnswers = new Array(DATA.length).fill(null);
+let currentPaperFilter = "ALL";
+
+function uniquePapers(){
+  const set = [...new Set(DATA.map(d=>d.paper))];
+  return set;
+}
+
+function populateFilter(){
+  const sel = document.getElementById('paperFilter');
+  sel.innerHTML = '<option value="ALL">All Papers (' + DATA.length + ' Qs)</option>';
+  uniquePapers().forEach(p=>{
+    const count = DATA.filter(d=>d.paper===p).length;
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p + ' (' + count + ' Qs)';
+    sel.appendChild(opt);
+  });
+}
+
+function getFilteredIndices(){
+  if(currentPaperFilter === "ALL") return DATA.map((_,i)=>i);
+  return DATA.map((d,i)=> d.paper===currentPaperFilter ? i : -1).filter(i=>i>=0);
+}
+
+function render(){
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+  const indices = getFilteredIndices();
+  document.getElementById('subtitle').textContent = indices.length + ' questions loaded — select an option, then Submit to see your score.';
+
+  indices.forEach((idx, order)=>{
+    const item = DATA[idx];
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'card-' + idx;
+
+    const meta = document.createElement('div');
+    meta.className = 'q-meta';
+    meta.textContent = item.paper + ' • Q' + (order+1);
+    card.appendChild(meta);
+
+    const qtext = document.createElement('div');
+    qtext.className = 'q-text';
+    qtext.textContent = item.q;
+    card.appendChild(qtext);
+
+    item.options.forEach((optText, oi)=>{
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.textContent = optText;
+      btn.onclick = ()=>{
+        if(userAnswers[idx] !== null) return; // lock after first pick
+        userAnswers[idx] = oi;
+        updateOptionStyles(idx, true);
+        updateProgress();
+      };
+      card.appendChild(btn);
+    });
+
+    if(item.note){
+      const flag = document.createElement('div');
+      flag.className = 'flag';
+      flag.textContent = '⚠ ' + item.note;
+      card.appendChild(flag);
+    }
+
+    container.appendChild(card);
+  });
+  updateOptionStylesAll();
+  updateProgress();
+}
+
+function updateOptionStylesAll(){
+  getFilteredIndices().forEach(idx=>updateOptionStyles(idx));
+}
+
+function updateOptionStyles(idx, reveal=false){
+  const card = document.getElementById('card-' + idx);
+  if(!card) return;
+  const opts = card.querySelectorAll('.opt');
+  opts.forEach((btn, oi)=>{
+    btn.classList.remove('selected','correct','wrong','disabled');
+    if(userAnswers[idx] === oi){
+      btn.classList.add('selected');
+    }
+    if(reveal){
+      btn.classList.add('disabled');
+      if(oi === DATA[idx].correct){
+        btn.classList.add('correct');
+      } else if(userAnswers[idx] === oi){
+        btn.classList.add('wrong');
+      }
+    }
+  });
+}
+
+function updateProgress(){
+  const indices = getFilteredIndices();
+  const answered = indices.filter(i=>userAnswers[i] !== null).length;
+  const pct = indices.length ? (answered/indices.length*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function submitQuiz(){
+  const indices = getFilteredIndices();
+  let correct = 0;
+  indices.forEach(idx=>{
+    updateOptionStyles(idx, true);
+    if(userAnswers[idx] === DATA[idx].correct) correct++;
+  });
+  document.getElementById('scoreBanner').style.display = 'block';
+  document.getElementById('scoreText').textContent = correct + ' / ' + indices.length;
+  const pct = indices.length ? Math.round(correct/indices.length*100) : 0;
+  document.getElementById('scoreSub').textContent = pct + '% correct — scroll down to review answers (green = correct, red = your wrong pick)';
+  document.getElementById('scoreBanner').scrollIntoView({behavior:'smooth'});
+}
+
+document.getElementById('paperFilter').addEventListener('change', (e)=>{
+  currentPaperFilter = e.target.value;
+  document.getElementById('scoreBanner').style.display = 'none';
+  render();
+});
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  userAnswers = new Array(DATA.length).fill(null);
+  document.getElementById('scoreBanner').style.display = 'none';
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+document.getElementById('submitBtn').addEventListener('click', submitQuiz);
+document.getElementById('submitBtn2').addEventListener('click', submitQuiz);
+
+populateFilter();
+render();
+</script>
+</body>
+</html>

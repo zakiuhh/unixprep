@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NED Math 2024 — Quiz</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --accent:#6366f1; --accent2:#8b5cf6;
+    --green:#16a34a; --red:#dc2626; --text:#e2e8f0; --muted:#94a3b8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:linear-gradient(135deg,#0f172a,#1e1b4b); color:var(--text); min-height:100vh;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:18px;}
+  header{text-align:center;padding:18px 0 6px;}
+  header h1{font-size:1.4rem;margin:0 0 4px;background:linear-gradient(90deg,#a78bfa,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  header p{color:var(--muted);margin:0;font-size:.85rem;}
+
+  .menu{display:flex;flex-direction:column;gap:14px;margin-top:24px;}
+  .mode-card{
+    background:var(--card);border-radius:16px;padding:20px;border:1px solid #334155;
+    cursor:pointer;transition:.2s;
+  }
+  .mode-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .mode-card h2{margin:0 0 6px;font-size:1.1rem;color:#c4b5fd;}
+  .mode-card p{margin:0;color:var(--muted);font-size:.85rem;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .progress-wrap{flex:1;background:#1e293b;border-radius:8px;height:8px;margin:0 12px;overflow:hidden;}
+  .progress-bar{height:100%;background:linear-gradient(90deg,#6366f1,#a78bfa);width:0%;transition:.3s;}
+  .scoreTag{font-size:.8rem;color:var(--muted);white-space:nowrap;}
+  .qnumTag{font-size:.8rem;color:var(--muted);white-space:nowrap;}
+
+  .qcard{background:var(--card);border-radius:16px;padding:20px;border:1px solid #334155;margin-bottom:16px;}
+  .qtext{font-size:1.02rem;line-height:1.5;margin-bottom:16px;white-space:pre-wrap;}
+  .opt{
+    display:block;width:100%;text-align:left;background:#0f172a;border:1px solid #334155;
+    color:var(--text);padding:12px 14px;border-radius:10px;margin-bottom:10px;font-size:.95rem;
+    cursor:pointer;transition:.15s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(22,163,74,.25);border-color:var(--green);color:#bbf7d0;}
+  .opt.incorrect{background:rgba(220,38,38,.25);border-color:var(--red);color:#fecaca;}
+  .opt.disabled{pointer-events:none;}
+  .opt b{margin-right:8px;color:var(--muted);}
+
+  .navrow{display:flex;gap:10px;margin-top:6px;}
+  .btn{
+    flex:1;padding:12px;border-radius:10px;border:none;font-size:.95rem;font-weight:600;cursor:pointer;
+  }
+  .btn-primary{background:linear-gradient(90deg,#6366f1,#8b5cf6);color:#fff;}
+  .btn-secondary{background:#1e293b;color:var(--text);border:1px solid #334155;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .resultCard{background:var(--card);border-radius:16px;padding:26px 20px;text-align:center;border:1px solid #334155;}
+  .resultCard h2{margin-top:0;color:#c4b5fd;}
+  .pct{font-size:3rem;font-weight:800;margin:10px 0;background:linear-gradient(90deg,#6366f1,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .resultStats{display:flex;justify-content:center;gap:24px;margin:14px 0 20px;}
+  .resultStats div{font-size:.85rem;color:var(--muted);}
+  .resultStats b{display:block;font-size:1.2rem;color:var(--text);}
+
+  .hidden{display:none !important;}
+  .reviewlist{text-align:left;margin-top:16px;max-height:300px;overflow-y:auto;padding-right:4px;}
+  .reviewItem{font-size:.82rem;padding:8px 0;border-bottom:1px solid #334155;}
+  .reviewItem .rTag{font-weight:700;}
+  .rTag.ok{color:var(--green);}
+  .rTag.bad{color:var(--red);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>NED Math 2024 Quiz</h1>
+    <p>Anees Hussain MCQ Bank — Practice Mode</p>
+  </header>
+
+  <div id="menuScreen" class="menu">
+    <div class="mode-card" onclick="startQuiz('full')">
+      <h2>📘 Full Test — All 162 Questions</h2>
+      <p>Attempt the entire question bank in order. Tap an option to reveal correct/incorrect instantly.</p>
+    </div>
+    <div class="mode-card" onclick="startQuiz('random')">
+      <h2>🎲 Random Quiz — 25 Questions</h2>
+      <p>25 random questions pulled from the full bank each time you start.</p>
+    </div>
+  </div>
+
+  <div id="quizScreen" class="hidden">
+    <div class="topbar">
+      <span class="qnumTag" id="qnumTag">Q 1/162</span>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      <span class="scoreTag" id="scoreTag">✓0 ✗0</span>
+    </div>
+    <div class="qcard">
+      <div class="qtext" id="qtext"></div>
+      <div id="optsWrap"></div>
+    </div>
+    <div class="navrow">
+      <button class="btn btn-secondary" id="backBtn" onclick="goBack()">⬅ Back</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="goNext()" disabled>Next ➡</button>
+    </div>
+  </div>
+
+  <div id="resultScreen" class="hidden">
+    <div class="resultCard">
+      <h2>Quiz Complete</h2>
+      <div class="pct" id="finalPct">0%</div>
+      <div class="resultStats">
+        <div><b id="finalCorrect">0</b>Correct</div>
+        <div><b id="finalWrong">0</b>Wrong</div>
+        <div><b id="finalTotal">0</b>Total</div>
+      </div>
+      <div class="navrow">
+        <button class="btn btn-secondary" onclick="goMenu()">🏠 Menu</button>
+        <button class="btn btn-primary" onclick="reviewToggle()" id="reviewBtn">📋 Review Answers</button>
+      </div>
+      <div class="reviewlist hidden" id="reviewList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+{q:"Sum of roots of lx² + mx + n = 0 is:",o:["−m/l","−n/l","m/l","n/l"],a:0},
+{q:"x³ − ax² − a²x + a³ is divided by (x + a) then remainder is:",o:["2a³","−a","0","1"],a:2},
+{q:"If A⃗ = i − 2j + k and B⃗ = 4i − 4j + 7k then projection of A⃗ onto B⃗ is",o:["25/9","17/9","22/9","19/9"],a:3},
+{q:"Solve |1 a b; 1 x b; 1 c x| = 0",o:["{a², b²}","{a, b}","{a, a²}","{b, b²}"],a:1},
+{q:"The value of ∫ x²·e^(2x³−3) dx =",o:["−1/(6e^(2x³−3)) + C","−1/(2e^(2x³−3)) + C","−1/3·e^(−2x³+3) + C","e^(−2x³+3) + C"],a:0},
+{q:"√y − eˣ = 2 then find dy/dx =",o:["2√y·eˣ","2√y/eˣ","2eˣ/√y","none"],a:0},
+{q:"If x = cos t and y = sin t then dy/dx =",o:["−cot t","−cos t","sin t","tan t"],a:0},
+{q:"The relative maxima of f(x) = x³ − 9x² + 15x + 3 is",o:["10","5","1","0"],a:0},
+{q:"The integral ∫ 3^(ax) dx =",o:["3^(ax)/a + C","a(3^(ax)) + C","3^(ax) + C","3^(ax)(ax) + C"],a:0},
+{q:"The integral ∫₀^(π/2) cos²(2x) dx =",o:["π/2","π/3","π/4","π"],a:2},
+{q:"The integral ∫₀^(π/2) cos²(x) dx =",o:["π/2","π/3","π/4","π"],a:2},
+{q:"The distance between (7,1) and (3, y) is 5 units. The value of y is equal to?",o:["4","−2","−4","Both A and B"],a:3},
+{q:"Given that foci of the ellipse are the points (3,0) and (−3,0), then find a where 16x² + (ay)² = (4a)²",o:["−5","−4","4","5"],a:3},
+{q:"The vertices of the ellipse 2x² + y² = 10 are:",o:["(0, ±√10)","(±√10, 0)","(0, ±√5)","(±√5, 0)"],a:0},
+{q:"Equation of asymptotes for the hyperbola 9x² − 16y² = 144 are:",o:["y = ±(3/4)x","y = ±(1/4)x","y = ±(1/3)x","y = ±(4/3)x"],a:0},
+{q:"The value of i¹⁸ + i³² − i⁶⁷ =",o:["i","−i","1","−1"],a:0},
+{q:"If A and B are any two sets then (A ∪ B)′ =",o:["A′ ∩ B′","A′ ∪ B′","A ∩ B","None"],a:0},
+{q:"All the diagonal elements of a square matrix are 1 and other are 0 then matrix is:",o:["unit matrix","scalar matrix","diagonal matrix","triangular matrix"],a:0},
+{q:"1/(1+tan²θ) =",o:["cos²θ","cot²θ","−sec²θ","sec²θ"],a:0},
+{q:"Let A = [[2,−2,0],[−3,1,2],[1,−3,−1]] and |A| = 12, the matrix B is equal to transpose of matrix A then |B| is:",o:["−1/12","−12","12","1/12"],a:2},
+{q:"In a geometric progression, first term is equal to 7 and the last term is equal to 448 and sum is equal to 889. The common ratio and number of terms respectively are.",o:["8 and 2","2 and 7","2 and 8","7 and 2"],a:1},
+{q:"cos 3x = 1/2 then x is equal to:",o:["(1/3)cos⁻¹(1/2)","60°","cos⁻¹(√3/2)","cos⁻¹(1/6)"],a:0},
+{q:"Which of the following is correct partial fraction expression of 1/(x³−1):",o:["A/(x−1) + B/(x²−1) + C/(x³−1)","A/(x−1) + B/(x²+x+1)","A/(x−1) + B/(x−1)² + C/(x−1)³","A/(x−1) + (Bx+C)/(x²+x+1)"],a:1},
+{q:"Find the equation of hyperbola having its centre at origin, transverse axis is along y-axis and length of its transverse axis and conjugate axis being 12 and 20 respectively.",o:["−x²/100 + y²/36 = 1","x²/100 − y²/36 = 1","−x²/36 + y²/100 = 1","x²/36 − y²/100 = 1"],a:0},
+{q:"The bus starting from a speed of 12m/s slows to 6 m/s in 3 seconds. The average acceleration of the bus is:",o:["2 m/s²","−2 m/s²","3 m/s²","4 m/s²"],a:1},
+{q:"The range of y = cos x is",o:["(−1,1)","(−∞, ∞)","(∞, −1)","All real numbers"],a:0},
+{q:"lim(x→0) cot x / cot 2x =",o:["2","1/2","1","0"],a:0},
+{q:"If A: (1, −3, 2) and B: (3, −5, 1) are points then direction cosine of the vector AB⃗ are",o:["2/3, −2/3, −1/3","2/3, 2/3, 1/3","−2/3, 2/3, −1/3","−2/3, 2/3, 1/3"],a:0},
+{q:"The quadratic equation having roots α and 2α, is",o:["x² − 3αx + 2α² = 0","x² − 4αx + 3α² = 0","x² − αx + 2α = 0","x² − 2αx + 3α = 0"],a:0},
+{q:"(1−cos 4x)/2 =",o:["sin²2x","cos²(x/2)","tan²2x","none"],a:0},
+{q:"If roots of the equation 3x² + kx + 12 = 0 are equal then value of k is",o:["±10","±11","±12","±13"],a:2},
+{q:"How many words can be formed from the word SWIMMING?",o:["40320","20160","10080","1680"],a:2},
+{q:"If x = 2ᵃ then value of 2^(a+3) =",o:["x","2x","4x","8x"],a:3},
+{q:"Displacement covered by body according to the velocity-time diagram is:",o:["130","140","100","40"],a:0},
+{q:"Eccentricity of circle is",o:["0","1","2","3/2"],a:0},
+{q:"The probability of getting same face in throwing two dice simultaneously:",o:["1/6","1/2","1/2","1"],a:0},
+{q:"If y = x² + x then dy/dx =",o:["2x + 1","x/2 − 1","2x² + 2","2x − 2"],a:0},
+{q:"If side of a square is 3cm. What is the change in its area if its side is decreasing at a rate of 2 cm/second?",o:["12","24","−36","None"],a:0},
+{q:"Find the total number that are divisible by 7 between 256 and 789.",o:["33","45","65","76"],a:3},
+{q:"In a G.P. if T₃ = 9/4 and T₆ = 243/32 then common ratio of the G.P. is:",o:["1/3","1/4","3/2","5/2"],a:2},
+{q:"√(x+1) + √(x−1) = √(x²+x+1), the equation is",o:["Exponential","radical","linear","none"],a:1},
+{q:"Find the vertices of hyperbola 4x² − y² = 16",o:["(0, ±4)","(0, ±2)","(±4,0)","(±2,0)"],a:3},
+{q:"If y = a·sin⁻¹(x/a) then dy/dx =",o:["a/√(a²−x²)","1/√(a²−x²)","a/√(1−x²)","None"],a:0},
+{q:"Coefficient of term involving x⁵ in (1 + x/2)¹² is:",o:["1/4","3/2","99/4","27/32"],a:2},
+{q:"The integral ∫₁^e ln x dx =",o:["1","e","0","1/e"],a:0},
+{q:"d/dx{ln(sin x)} =",o:["−1/sin x","−cos x","cot x","tan x"],a:2},
+{q:"Find the eccentricity of the ellipse having axes as 12 and 20.",o:["√2","√3","4/5","1/2"],a:2},
+{q:"d/dx(e^(x²)) =",o:["e^(x²)","x²eˣ²","2x·e^(x²)","None"],a:2},
+{q:"If A is a square matrix and A² = A then A is:",o:["involutory matrix","idempotent matrix","symmetric matrix","Hermitian matrix"],a:1},
+{q:"d/dx ln|x² + 2x| =",o:["1/(x²+2x)","2x/(x²+2x)","(2x+2)/(x²+2x)","(x²+2x)/(2x+2)"],a:2},
+{q:"If 16ˣ = 4 and 5^(x+y) = 625 then y =",o:["7/2","3/2","1/2","None"],a:1},
+{q:"lim(x→0) (1/x − 1/(eˣ−1)) =",o:["1/2","2","1","∞"],a:0},
+{q:"The integral ∫₀^(π/4) cos⁴x dx =",o:["3π/16","3π/4","2/3","π/4"],a:0},
+{q:"1/(1+sin θ) − 1/(1−sin θ) =",o:["sec²θ","cot²θ","2 cosec θ","2 sec θ tan θ"],a:3},
+{q:"If x+10, x−2, x−10 are terms of geometric progression then x =",o:["23","24","25","26"],a:3},
+{q:"Tₙ for the sequence 1/3, 2/3, 4/3, …",o:["2^(n−1)/3","2ⁿ/3","3/2^(n−1)","3/2ⁿ"],a:0},
+{q:"Middle terms in the expansion of (x³ + 1/x²)⁷ are:",o:["7x⁴ and 21x","21x³ and 21/x⁸","7x² and 18/x⁶","35x⁶ and 35x"],a:3},
+{q:"Two dice are rolled once then probability that numbers appearing are different is",o:["5/6","1/6","2/3","1"],a:0},
+{q:"Two coins are rolled, probability of getting same faces is",o:["1/4","2/3","3/4","1/2"],a:3},
+{q:"If A is a square matrix and A^(k+1) = A, where k is positive integer then A is:",o:["periodic matrix","symmetric matrix","idempotent matrix","Hermitian matrix"],a:0},
+{q:"d/dx(cos⁻¹2x) =",o:["−2/√(1−4x²)","−1/√(1−4x²)","1/√(1−2x²)","2/√(1−2x)"],a:0},
+{q:"If x = 45°, then 2 − cos 2x − sin 2x =",o:["−1","0","1","None"],a:2},
+{q:"The area of triangle whose vertices are represented by the edges A(1,1,1), B(1,1,0) and C(1,0,0)",o:["1","2","1/2","3/2"],a:2},
+{q:"If T₂ = 4 and T₅ = 48 then find the sum of first 10 terms:",o:["1240","1660/3","243","654/5"],a:1},
+{q:"The solution of the differential equation dy/dx = 2 − 1/√x is",o:["y = 2x − 2√x + C","y²/2 = 2 − 1/√x + C","y = 2/x − 1/√x + C","none"],a:0},
+{q:"The integral 3∫₀¹ 1/√(1−x²) dx =",o:["3π/2","π/2","π/4","3"],a:0},
+{q:"d/dx{e^(sin x) cos x} =",o:["e^(sin x)(−sin x + cos²x)","e^(sin x)(−cos x + cos²x)","e^(sin x)(sin²x − sin x)","none"],a:0},
+{q:"i, k, j being unit vectors along x, y, z axes respectively then i·i = j·j = k·k =",o:["0","−1","1","Not defined"],a:2},
+{q:"(a⁻¹+b⁻¹)/a⁻¹ =",o:["(a+b)/b","(a+b)/a","(a+1)/b","(1+b)/a"],a:0},
+{q:"∫(2x−5)² dx =",o:["(2x−5)³/6 + C","(2x−5)³/3 + C","(2x−5)³/2 + C","none"],a:0},
+{q:"If f(x) = x⁴ + 98x³ + 99x² − 190 then find f(99) =",o:["192119012","1940596","19145","192311"],a:0},
+{q:"If f(x) = sin x then f″(π/2) is equal to:",o:["−1","0","1","1/2"],a:0},
+{q:"In a triangle ABC, sin A = 1/3 and sin B = 1/4 then calculate sin C:",o:["0.5588","0.211","0.324","0.623"],a:0},
+{q:"Quadratic equation with roots −4 and 8 is:",o:["x² − 4x + 32 = 0","x² − 4x − 32 = 0","x² + 4x + 32 = 0","x² − 4x − 32 = 0"],a:0},
+{q:"If α = 72°, β = 29° and c = 9cm then lengths a and b respectively are:",o:["8.71 and 4.44","5.21 and 7.52","2.71 and 4.65","3.31 and 7.72"],a:0},
+{q:"If α, β are the roots of 2x² − 4x + 5 = 0 then value of (α+1)(β+1) =",o:["2/11","−2/11","11/2","−11/2"],a:2},
+{q:"The integral ∫₀^(π/2) cos³x sin x dx =",o:["0","1/2","1/4","3/16"],a:2},
+{q:"Product of the roots of 3x² − 5x + 2 = 0 is:",o:["2/3","5/3","−5/3","−2/3"],a:0},
+{q:"(3−2i)² − 6(3−2i) + 9 =",o:["−4","4","−3","3"],a:0},
+{q:"If a row or a column of a matrix is zero. Then determinant of the matrix will be:",o:["0","1","−1","None"],a:0},
+{q:"The centre of the circle x² + y² − 6x + 8y + 1 = 0 is",o:["(−6,8)","(6,−8)","(−3,4)","(3,−4)"],a:3},
+{q:"(n+1)!/(n−1)! =",o:["n(n+1)","n(n−1)","(n+1)/(n−1)","n+1"],a:0},
+{q:"If f(x) = xˣ then f′(x) is equal to:",o:["x·ln x(ln x + 1)","xˣ(ln x + 1)","xˣ(ln x − 1)","None of these"],a:1},
+{q:"Find s when a = 2, b = 3, c = 5",o:["5","10","12","15"],a:0},
+{q:"The force F⃗ = 3i + 2j − 4k is applied at the point (1, −1, 0). Find the moment of F⃗ about the point (2, 1, −3).",o:["−2i − 5j − 4k","3i − 2j − k","−i + j + k","None"],a:0},
+{q:"The integral ∫ e^(x²)·x dx =",o:["e^(x²) + C","2e^(x²) + C","(1/2)e^(x²) + C","2x·e^(x²) + C"],a:2},
+{q:"(a²)³ + b²b³ =",o:["a⁶ + b⁶","a⁶ − b⁵","a⁶ + b⁵","a⁵ − b³"],a:2},
+{q:"If A = 2i + k and B = j + k then find a vector perpendicular to A and B of magnitude 5:",o:["(5/2)(−i + 3j + k)","(5/3)(−i − 2j + 2k)","(5/4)(i − 2j + 2k)","2i − j + 4k"],a:1},
+{q:"If y = aˣ then dy/dx =",o:["aˣ(ln a)","aˣ(ln x)","1/aˣ","aˣ·ln x"],a:0},
+{q:"(A⃗ + B⃗) × (A⃗ − B⃗) =",o:["2(B⃗ × A⃗)","2(A⃗ × B⃗)","A⃗ + B⃗","A⃗ − B⃗"],a:0},
+{q:"Two coins are tossed then probability of obtaining two heads is:",o:["1/4","3/4","1/2","1"],a:0},
+{q:"lim(x→0+) x·ln x =",o:["0","1","2","Does not exist"],a:0},
+{q:"Sum of 25 terms when T₄ = 4 and T₂₂ = 5",o:["215/4","15/16","225/2","525/32"],a:2},
+{q:"Cube roots of unity are:",o:["1, ω, ω²","1, 1/ω, ω²","1, ω, 1/ω²","1, 1+ω, 1+ω²"],a:0},
+{q:"d/dx(e^(x²)) =",o:["2x·e^(x²)","e^(x²)","e^(x²)","e^(x²)"],a:0},
+{q:"For x⁴ + y⁴ = 1250 find slope of tangent at (5,5) is:",o:["1","−1","1/5","5"],a:1},
+{q:"The integral ∫₋₃^(−1) dx/(x−1)³ =",o:["−4/31","−3/31","−5/32","−3/32"],a:3},
+{q:"If sin x = 3/4 and x is in first quadrant then value of cos x is:",o:["√7/3","4/3","√7/4","3/5"],a:2},
+{q:"Foci of the ellipse 4x² − 9y² = 36 are at:",o:["(±√5, 0)","(±√13, 0)","(0, ±√13)","(0, ±5)"],a:1},
+{q:"d/dx((eˣ−1)/(eˣ+1)) =",o:["eˣ/(eˣ+1)²","2eˣ/(eˣ+1)²","eˣ/(eˣ−1)²","2eˣ/(eˣ−1)²"],a:1},
+{q:"In an H.P., the 10th term is 35, the 34th term is 25 and last term is 2. Find the number of terms:",o:["1000","900","700","500"],a:0},
+{q:"If f(x) = ax² + bx + c and f(1) = 3, f(−1) = 3 then a + c =",o:["1","2","3","4"],a:2},
+{q:"The area of triangle having vertices (3,2), (1,−5) and (2,3) is",o:["1/2","9/2","4","none"],a:1},
+{q:"A card is drawn at random. Probability that selected card is not a face card, is:",o:["1/4","4/13","10/13","1/12"],a:2},
+{q:"If A is a square matrix and Aᵗ = A, then A is:",o:["symmetric matrix","symmetric matrix","idempotent matrix","Hermitian matrix"],a:0},
+{q:"If A is a square matrix and Aᵗ = −A, then A is:",o:["skew symmetric matrix","symmetric matrix","idempotent matrix","Hermitian matrix"],a:0},
+{q:"The value of i³ is equal to: Where i is imaginary unit",o:["i","1","−i","−1"],a:2},
+{q:"cos(α/2) =",o:["√(s(s−b)/bc)","√((s−a)(s−b)/bc)","√((s−b)(s−c)/ac)","√(s(s−a)/bc)"],a:3},
+{q:"If ∫₁³ f(x)dx = 3 then ∫₁³ 5f(x)dx =",o:["1","2","4","15"],a:3},
+{q:"There are 83 people in the gym from which 51 are kick boxing, 25 are of yoga and 11 for both. Then number of persons who do not take part in either category:",o:["9","11","18","21"],a:2},
+{q:"The value of 0! and 1! respectively are:",o:["0 and 1","1 and 1","0 and −1","1 and −1"],a:1},
+{q:"If A, G, H are the arithmetic, geometric and harmonic mean between any two numbers then which is true:",o:["G² = AH","G = A/H","A² = GH","G = (A+H)/2"],a:0},
+{q:"If f(x) = tan⁻¹(3x) then f′(x) =",o:["1/(1+9x²)","3/(1+9x²)","9/(1+3x²)","1/(1+x²)"],a:1},
+{q:"The integral ∫ e^(1/u)/u² du =",o:["e^(1/u) + C","−e^(1/u) + C","u·e^(1/u) + C","u²·e^(1/u) + C"],a:1},
+{q:"|1 0 0; 0 ω 0; 0 0 ω²| =",o:["0","−1","1","ω"],a:2},
+{q:"Solve (x+2)/(x−2) + (x−2)/(x+2) = 34/15",o:["{8, −8}","{4, −4}","{2, −4}","{−2, 4}"],a:0},
+{q:"The value of (sin⁴θ − cos⁴θ)/(sin²θ − cos²θ) =",o:["sin²θ − cos²θ","tan²θ","0","1"],a:3},
+{q:"If 2³(2²) = 2^k then what is the value k",o:["3","2","1","5"],a:3},
+{q:"Term independent of x in (x² − 2/x²)¹² is:",o:["54136","53136","51136","59136"],a:3},
+{q:"Eccentricity of parabola is",o:["0","1","1/2","3/2"],a:1},
+{q:"The length of latus rectum of y² = 4ax is:",o:["2","a","4a","None"],a:2},
+{q:"If the average of 8 students on a test is 77. If 4 of them got 73 marks, then what will be the sum of scores of other 4?",o:["324","211","127","623"],a:0},
+{q:"Partial fraction of (x+34)/((x−6)(x+2)) are:",o:["5/(x−6) − 4/(x+2)","1/(2(x−6)) − 3/(x−2)","1/(x−6) − 1/(x−2)","2/(x−6) − 3/(x−2)"],a:0},
+{q:"If A is non-singular matrix then A⁻¹ =",o:["Adj A/|A|","|A|·Adj A","|A|/Adj A","Not possible"],a:0},
+{q:"(x³−3x²+5x−32)/(x−2) then quotient is",o:["13","x+3","x−3","x²−x+3"],a:3},
+{q:"Cofactor A₃₂ of [[1,2,3],[4,0,−1],[0,0,2]] is",o:["15","13","1","0"],a:1},
+{q:"The 5th term in the expansion of (2 + x/2)⁹ is:",o:["63x⁴","126x⁴","252x⁴","1008x⁴"],a:2},
+{q:"In a bag, there are 3 blue marbles, 4 green marbles and 2 orange marbles. What is the probability of not getting any orange marble?",o:["7/9","1/3","2/9","none"],a:0},
+{q:"∫ tan 2x dx =",o:["(1/2)ln|sec 2x| + C","ln|sec x| + C","(1/2)ln|sin 2x| + C","ln|sin x| + C"],a:0},
+{q:"Which law can be reduced to Pythagoras theorem",o:["Law of sines","Law of tangents","Law of cosines","None"],a:2},
+{q:"The integral ∫(π/4)^(π/3) tan x dx =",o:["ln 2","ln√2","ln 3","ln√3"],a:1},
+{q:"P(A) = 1/3, P(B) = 1/4 and P(A∩B) = 1/6 then P(A∪B)′ =",o:["1/12","1/20","7/12","S"],a:2},
+{q:"Length of tangent from (2,2) to 2(x²+y²) − 7x + 9y − 1 = 0 is",o:["3","5","8","10"],a:0},
+{q:"The equation of straight line passing through (7,−4) and (8,5) is:",o:["9x − y − 67 = 0","x − 3y − 12 = 0","2y − 6x − 4 = 0","x − 9y − 67 = 0"],a:0},
+{q:"The integral ∫ e^(tan x)·sec²x dx =",o:["e^(tan x) + C","e^(sec²x) + C","e^(sec x) + C","e^(tan²x) + C"],a:0},
+{q:"lim(x→a) (xⁿ−aⁿ)/(x−a) =",o:["n·aⁿ⁻¹","n·xⁿ⁻¹","aⁿ","n·xⁿ"],a:0},
+{q:"If tan x = 3 then value of sin²x/cos²x is:",o:["0","1","3","9"],a:3},
+{q:"Equation of perpendicular bisector through the join of (5,4) and (−4,2) is:",o:["18x + 4y − 21 = 0","18x − 4y − 21 = 0","18x − 4y + 21 = 0","18x + 4y + 21 = 0"],a:0},
+{q:"ω³² =",o:["ω²","ω","1","−ω"],a:0},
+{q:"The total number of words that can be formed using all the letters of the word REARRANGE are:",o:["15120","40320","20160","None"],a:0},
+{q:"∫ tan x·sec²x dx =",o:["tan²x + C","sec²x + C","sec³x/3 + C","tan²x/2 + C"],a:3},
+{q:"If tan θ = 1 then find the value of (3cos²θ+6sin²θ)/(sin5θ+8cos²θ+5sin²θ) is",o:["0.776","0.523","0.487","0.234"],a:0},
+{q:"If f(x) = eˣ + cos 2x then d²y/dx² =",o:["eˣ + cos 2x","eˣ − 4cos 2x","eˣ + 4cos 2x","eˣ − 2sin 2x"],a:1},
+{q:"If a card is drawn at random then probability of getting red king is:",o:["1/13","1/4","1/26","1/36"],a:2},
+{q:"The roots of ax² + bx + c = 0; a ≠ 0 are imaginary then",o:["b² − 4ac = 0","b² − 4ac > 0","b² − 4ac < 0","b² − 4ac ≥ 0"],a:2},
+{q:"If two vectors are perpendicular then their scalar product is:",o:["−1","0","1","2"],a:1},
+{q:"If z is a complex number and its conjugate is z̄ then product of z and z̄ is:",o:["0","1","z","|z|²"],a:3},
+{q:"Least number of terms of the geometric progression 4,8,16,… that must be taken so that sum exceeds 500:",o:["6","7","8","9"],a:1},
+{q:"Equation of an ellipse is 4x² + 25y² = 100. The distance between foci will be:",o:["2√19","√19","√21","2√21"],a:3},
+{q:"The angle between the lines y = 2x + 1 and y = 3x − 1 is",o:["tan⁻¹(1/2)","tan⁻¹(1/3)","tan⁻¹(1/5)","tan⁻¹(1/7)"],a:3},
+{q:"If (2−5i)/(1−i) = x + iy then (x, y) is:",o:["(−1/2, 1/5)","(2/3, 4/5)","(3/8, −1/8)","(7/2, 3/2)"],a:3},
+{q:"lim(x→π/2) cos x / x² =",o:["−1","0","1","Does not exist"],a:1},
+{q:"(x+3)³ − 3(x+3)² + 3(x+3) − 1 =",o:["(x+1)³","(x+2)³","(x+3)³","None"],a:1},
+{q:"lim(x→0) ln x / x =",o:["−e","0","1","Does not exist"],a:3},
+{q:"Transverse axis is on the line x = 2, length of transverse axis is 4, conjugate axis is of length 2 along the line y = 3 then equation of hyperbola is",o:["4x² − y² + 16x + 6y = −11","4x² − y² − 16x + 6y = −11","4x² − y² + 16x − 6y = −11","4x² − y² − 16x − 6y = −11"],a:1},
+{q:"lim(x→∞) ln x / x =",o:["−∞","∞","0","e"],a:2},
+{q:"Four arithmetic means (A.M) are inserted between (a−b) and (9a−11b) then value of 4th A.M. is:",o:["(37a−45b)/5","(36a−39b)/4","(21a−22b)/3","(33a−3b)/2"],a:0},
+{q:"If A and B are non-zero matrices of same dimension then (A−B)² =",o:["A² − 2AB + B²","A² − B²","A² + B²","None"],a:3},
+{q:"Slope of the line 3x − 2y = 6 is",o:["2/3","3/2","−1/2","−1/3"],a:1},
+{q:"[[1,0],[−i,−1]]·[[1,−1],[i,0]]·[[0,i],[0,−i]] =",o:["[[0,2i],[0,3]]","[[−i,2i],[2i,3]]","[[9i,2i],[0,0]]","[[3,2i],[1,3i]]"],a:0},
+{q:"∫₀^π √(1+cos x) dx =",o:["π/2","3π/4","√6/2","2√2"],a:3},
+{q:"A swimming pool 40 feet long has a depth of 4 feet on one side and 8 feet on the other side. What is the distance along the bottom?",o:["√101","98√2","32√3","4√101"],a:3},
+];
+
+let quizSet = [];
+let current = 0;
+let answers = []; // {selected, correct, qIndex}
+let mode = '';
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function startQuiz(m){
+  mode = m;
+  const indices = QUESTIONS.map((_,i)=>i);
+  if(m==='full'){
+    quizSet = indices;
+  } else {
+    quizSet = shuffle(indices).slice(0,25);
+  }
+  current = 0;
+  answers = new Array(quizSet.length).fill(null);
+  document.getElementById('menuScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const qIdx = quizSet[current];
+  const q = QUESTIONS[qIdx];
+  document.getElementById('qnumTag').textContent = `Q ${current+1}/${quizSet.length}`;
+  document.getElementById('progressBar').style.width = ((current)/quizSet.length*100)+'%';
+  document.getElementById('qtext').textContent = (current+1)+". "+q.q;
+
+  const optsWrap = document.getElementById('optsWrap');
+  optsWrap.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.o.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<b>${letters[i]}.</b> ${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    optsWrap.appendChild(btn);
+  });
+
+  updateScoreTag();
+
+  const prevAns = answers[current];
+  document.getElementById('nextBtn').disabled = (prevAns===null);
+  document.getElementById('backBtn').disabled = (current===0);
+
+  if(prevAns!==null){
+    revealAnswer(prevAns.selected, q.a);
+  }
+}
+
+function selectAnswer(i){
+  if(answers[current]!==null) return; // already answered
+  const qIdx = quizSet[current];
+  const q = QUESTIONS[qIdx];
+  answers[current] = {selected:i, correct:(i===q.a)};
+  revealAnswer(i, q.a);
+  document.getElementById('nextBtn').disabled = false;
+  updateScoreTag();
+}
+
+function revealAnswer(selected, correctIdx){
+  const opts = document.querySelectorAll('#optsWrap .opt');
+  opts.forEach((btn,i)=>{
+    btn.classList.add('disabled');
+    if(i===correctIdx) btn.classList.add('correct');
+    else if(i===selected) btn.classList.add('incorrect');
+  });
+}
+
+function updateScoreTag(){
+  let c=0, w=0;
+  answers.forEach(a=>{ if(a){ a.correct?c++:w++; } });
+  document.getElementById('scoreTag').textContent = `✓${c} ✗${w}`;
+}
+
+function goNext(){
+  if(current < quizSet.length-1){
+    current++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function goBack(){
+  if(current>0){
+    current--;
+    renderQuestion();
+  }
+}
+
+function showResult(){
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+  let c=0,w=0;
+  answers.forEach(a=>{ if(a){ a.correct?c++:w++; } });
+  const total = quizSet.length;
+  const pct = Math.round((c/total)*100);
+  document.getElementById('finalPct').textContent = pct+'%';
+  document.getElementById('finalCorrect').textContent = c;
+  document.getElementById('finalWrong').textContent = w;
+  document.getElementById('finalTotal').textContent = total;
+
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = '';
+  reviewList.classList.add('hidden');
+  document.getElementById('reviewBtn').textContent = '📋 Review Answers';
+
+  const letters=['A','B','C','D'];
+  quizSet.forEach((qIdx,i)=>{
+    const q = QUESTIONS[qIdx];
+    const a = answers[i];
+    const div = document.createElement('div');
+    div.className = 'reviewItem';
+    if(a){
+      div.innerHTML = `<span class="rTag ${a.correct?'ok':'bad'}">${a.correct?'✓':'✗'}</span> Q${i+1}: ${q.q}<br>
+      Your answer: ${letters[a.selected]}) ${q.o[a.selected]} ${a.correct?'':'— Correct: '+letters[q.a]+') '+q.o[q.a]}`;
+    } else {
+      div.innerHTML = `<span class="rTag bad">—</span> Q${i+1}: ${q.q}<br>Not answered. Correct: ${letters[q.a]}) ${q.o[q.a]}`;
+    }
+    reviewList.appendChild(div);
+  });
+}
+
+function reviewToggle(){
+  const rl = document.getElementById('reviewList');
+  rl.classList.toggle('hidden');
+  document.getElementById('reviewBtn').textContent = rl.classList.contains('hidden') ? '📋 Review Answers' : '🔼 Hide Review';
+}
+
+function goMenu(){
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('menuScreen').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physics MCQ Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161923;
+    --surface2: #1e2433;
+    --border: #2a3147;
+    --accent: #5b8cff;
+    --accent2: #7c3aed;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+    --text: #e8ecf4;
+    --muted: #7a85a0;
+    --gold: #f59e0b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(91,140,255,0.08) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, rgba(124,58,237,0.07) 0%, transparent 60%);
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,15,20,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    background: linear-gradient(90deg, #5b8cff, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+  }
+
+  .score-bar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  .score-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 12px;
+  }
+
+  .score-chip .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+
+  .dot-correct { background: var(--correct); }
+  .dot-wrong { background: var(--wrong); }
+  .dot-total { background: var(--accent); }
+
+  .progress-wrap {
+    flex: 1;
+    max-width: 300px;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .q-card.answered-correct { border-color: rgba(34,197,94,0.35); }
+  .q-card.answered-wrong   { border-color: rgba(239,68,68,0.25); }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .q-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: rgba(91,140,255,0.1);
+    border: 1px solid rgba(91,140,255,0.25);
+    border-radius: 6px;
+    padding: 3px 8px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .q-text {
+    font-size: 0.97rem;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .q-options {
+    padding: 14px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .opt-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .opt-btn:not(.disabled):hover {
+    border-color: var(--accent);
+    background: rgba(91,140,255,0.07);
+    transform: translateX(2px);
+  }
+
+  .opt-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: rgba(255,255,255,0.05);
+    border-radius: 5px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .opt-btn.correct {
+    border-color: var(--correct);
+    background: rgba(34,197,94,0.1);
+  }
+  .opt-btn.correct .opt-label { color: var(--correct); background: rgba(34,197,94,0.15); }
+
+  .opt-btn.wrong {
+    border-color: var(--wrong);
+    background: rgba(239,68,68,0.09);
+  }
+  .opt-btn.wrong .opt-label { color: var(--wrong); background: rgba(239,68,68,0.15); }
+
+  .opt-btn.revealed-correct {
+    border-color: rgba(34,197,94,0.5);
+    background: rgba(34,197,94,0.06);
+  }
+  .opt-btn.revealed-correct .opt-label { color: var(--correct); }
+
+  .opt-btn.disabled { cursor: default; }
+
+  .icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 8px;
+  }
+
+  .feedback-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 22px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-top: 1px solid var(--border);
+  }
+
+  .feedback-bar.show { display: flex; }
+  .feedback-bar.fb-correct { color: var(--correct); }
+  .feedback-bar.fb-wrong   { color: var(--wrong); }
+  .fb-icon { font-size: 1rem; }
+
+  .note-box {
+    font-size: 0.8rem;
+    color: var(--gold);
+    background: rgba(245,158,11,0.07);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 0 22px 14px;
+    display: none;
+  }
+
+  .note-box.show { display: block; }
+
+  /* Summary card at top */
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    text-align: center;
+  }
+
+  .sum-stat { }
+  .sum-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    display: block;
+  }
+  .sum-lbl {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .sum-val.c { color: var(--correct); }
+  .sum-val.w { color: var(--wrong); }
+  .sum-val.t { color: var(--accent); }
+  .sum-val.p { color: var(--gold); }
+
+  @media (max-width: 600px) {
+    header { flex-wrap: wrap; }
+    .progress-wrap { display: none; }
+    .q-text { font-size: 0.9rem; }
+    .opt-btn { font-size: 0.87rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ PHYSICS MCQ</h1>
+  <div class="score-bar">
+    <div class="score-chip"><span class="dot dot-correct"></span><span id="hdr-correct">0</span> Correct</div>
+    <div class="score-chip"><span class="dot dot-wrong"></span><span id="hdr-wrong">0</span> Wrong</div>
+    <div class="score-chip"><span class="dot dot-total"></span><span id="hdr-answered">0</span>/76</div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog-fill"></div></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="summary-card">
+    <div class="sum-stat"><span class="sum-val t" id="stat-total">76</span><span class="sum-lbl">Questions</span></div>
+    <div class="sum-stat"><span class="sum-val c" id="stat-correct">0</span><span class="sum-lbl">Correct</span></div>
+    <div class="sum-stat"><span class="sum-val w" id="stat-wrong">0</span><span class="sum-lbl">Wrong</span></div>
+    <div class="sum-stat"><span class="sum-val p" id="stat-pct">0%</span><span class="sum-lbl">Score</span></div>
+  </div>
+
+  <div id="quiz-root"></div>
+</div>
+
+<script>
+const questions = [
+  {
+    n: 75,
+    q: "Which of the following pairs are vector quantities?",
+    opts: ["Velocity and acceleration", "Mass and time", "Speed and distance", "Energy and temperature"],
+    ans: 0
+  },
+  {
+    n: 76,
+    q: "Transistor can be used as:",
+    opts: ["Amplifier", "Electronic switch", "Oscillator", "All the above"],
+    ans: 3
+  },
+  {
+    n: 77,
+    q: "Which of the following best describes pair production?",
+    opts: ["A neutron splits into a proton and electron", "A high-energy photon creates an electron and a positron", "An electron combines with a proton to form a neutron", "A photon loses all energy without interaction"],
+    ans: 1
+  },
+  {
+    n: 78,
+    q: "If a wheel rotates with angular velocity ω = 10 rad/s and radius r = 0.5 m, what is the linear velocity v?",
+    opts: ["2 m/s", "5 m/s", "10 m/s", "20 m/s"],
+    ans: 1
+  },
+  {
+    n: 79,
+    q: "If the focal length of a lens is 25 cm, what is its power in diopters?",
+    opts: ["2 D", "2.5 D", "3 D", "4 D"],
+    ans: 3
+  },
+  {
+    n: 80,
+    q: "If the distance between two masses is doubled, what happens to the gravitational force between them?",
+    opts: ["It becomes half", "It becomes double", "It becomes one-fourth", "It remains the same"],
+    ans: 2
+  },
+  {
+    n: 81,
+    q: "A metal rod of length 100 cm at 20°C is heated to 120°C and expands by 0.12 cm. What is the coefficient of linear expansion α?",
+    opts: ["1.2 × 10⁻⁴ /°C", "1.0 × 10⁻⁵ /°C", "1.2 × 10⁻⁵ /°C", "1.0 × 10⁻⁴ /°C"],
+    ans: 2
+  },
+  {
+    n: 82,
+    q: "The meter bridge is used to—",
+    opts: ["Measure the electric current in a circuit", "Measure the potential difference across a resistance", "Measure the resistance of a resistor", "Measure the power supplied in the circuit"],
+    ans: 2
+  },
+  {
+    n: 83,
+    q: "Which of the following is a scalar quantity?",
+    opts: ["Electric field intensity", "Magnetic flux density", "Inductance", "None of these"],
+    ans: 2
+  },
+  {
+    n: 84,
+    q: "A student makes a pendulum that completes one oscillation in 0.5 sec, but wants it to complete one oscillation in 1 sec. What should be the new length of the pendulum if the original length is L?",
+    opts: ["L/4", "L/2", "2L", "4L"],
+    ans: 3
+  },
+  {
+    n: 85,
+    q: "What is the potential energy of an object of mass 10 kg placed at a height of 10 m? (Take g = 9.8 m/s²)",
+    opts: ["9.8 J", "98 J", "980 J", "9800 J"],
+    ans: 2
+  },
+  {
+    n: 86,
+    q: "Magnetic field inside a long straight solenoid is:",
+    opts: ["Zero", "Uniform", "Non-uniform", "Inversely proportional to current"],
+    ans: 1
+  },
+  {
+    n: 87,
+    q: "Faraday's laws of electromagnetic induction are related to:",
+    opts: ["The e.m.f. of a chemical cell", "The current flowing in a conductor", "The e.m.f. of a generator", "The strength of a magnetic field"],
+    ans: 2
+  },
+  {
+    n: 88,
+    q: "The kinetic friction is always:",
+    opts: ["Less than the rolling friction", "Greater than the rolling friction", "Equal to the rolling friction", "All of the above"],
+    ans: 1
+  },
+  {
+    n: 89,
+    q: "Laser produces:",
+    opts: ["Monochromatic light", "Highly directional beam", "Phase-coherent light", "All of the above"],
+    ans: 3
+  },
+  {
+    n: 90,
+    q: "If an ant completes a full round trip (360°) in 12 seconds, then in 2 seconds, the angle it covers is:",
+    opts: ["30 degrees", "40 degrees", "60 degrees", "90 degrees"],
+    ans: 2
+  },
+  {
+    n: 91,
+    q: "The dimensional formula of resistance is:",
+    opts: ["[ML²T⁻²A⁻¹]", "[ML²T⁻³A⁻²]", "[MLT⁻³A⁻²]", "[M⁻¹L²T⁻³A⁻²]"],
+    ans: 1
+  },
+  {
+    n: 92,
+    q: "A string of length L vibrates in its fundamental mode with frequency f. To make it vibrate in two segments at the same frequency, what should be the new tension?",
+    opts: ["2T", "4T", "T/2", "T/4"],
+    ans: 1
+  },
+  {
+    n: 93,
+    q: "A force of 10 N is applied perpendicular to a wrench at a distance of 0.5 m from the pivot. What is the moment arm?",
+    opts: ["0.5 m", "5 m", "10 m", "20 m"],
+    ans: 0
+  },
+  {
+    n: 94,
+    q: "The SI unit of light intensity is:",
+    opts: ["Lumen", "Lux", "Candela", "Watt"],
+    ans: 2
+  },
+  {
+    n: 95,
+    q: "Force on a moving charge is maximum when the angle between magnetic flux density and velocity is:",
+    opts: ["0°", "45°", "90°", "180°"],
+    ans: 2
+  },
+  {
+    n: 96,
+    q: "A helicopter of weight 2490 N is ascending vertically with a constant velocity of 4 m/s. What is the upward force acting on it?",
+    opts: ["0 N", "245 N", "2490 N", "5000 N"],
+    ans: 2
+  },
+  {
+    n: 97,
+    q: "If a force of 10 N acts on a body of mass 2 kg for 2 seconds, what is the rate of change of momentum?",
+    opts: ["2 kg·m/s²", "5 kg·m/s²", "10 kg·m/s²", "20 kg·m/s²"],
+    ans: 2
+  },
+  {
+    n: 98,
+    q: "Electric potential is:",
+    opts: ["Proportional to work done", "Zero when charge is in electric field", "Always equal to electric field", "Inversely proportional to electric field"],
+    ans: 0
+  },
+  {
+    n: 99,
+    q: "Potentiometer sensitivity can be increased by:",
+    opts: ["Increasing the current in potentiometer wire", "Increasing the length of potentiometer wire", "Decreasing the length of potentiometer wire", "Replacing the standard cell by a regulated power supply"],
+    ans: 1
+  },
+  {
+    n: 100,
+    q: "In a series RLC circuit, resonance is achieved when:",
+    opts: ["ω = 1/√(RC)", "ω = 1/√(RL)", "ω = 1/√(LC)", "ω = R/L"],
+    ans: 2
+  },
+  {
+    n: 101,
+    q: "If the velocity of a body is reduced to half, which of the following will also be halved?",
+    opts: ["Momentum", "Kinetic Energy", "Potential Energy", "None of these"],
+    ans: 0
+  },
+  {
+    n: 102,
+    q: "The centre of the lens is called:",
+    opts: ["Principal focus", "Principal axis", "Optical centre", "None"],
+    ans: 2
+  },
+  {
+    n: 103,
+    q: "If a convex lens is cut vertically into two equal halves, what happens to the intensity of the image formed by one half?",
+    opts: ["Intensity becomes half", "Intensity remains same", "Intensity becomes double", "Intensity becomes zero"],
+    ans: 0
+  },
+  {
+    n: 104,
+    q: "If the velocity of an object is reduced to one-fourth of its original value, its kinetic energy becomes:",
+    opts: ["1/2", "1/16", "1/8", "1/4"],
+    ans: 1,
+    note: "KE ∝ v² → KE' = ½m(v/4)² = (1/16)(½mv²) = KE/16"
+  },
+  {
+    n: 105,
+    q: "If the area of a parallel plate capacitor is doubled (while keeping the distance constant), the capacitance will:",
+    opts: ["Become half", "Remain same", "Double", "Become four times"],
+    ans: 2
+  },
+  {
+    n: 106,
+    q: "Inertia of a body is the property by which it:",
+    opts: ["Gains speed continuously", "Attracts other objects", "Resists change in its state of motion", "Changes direction without force"],
+    ans: 2
+  },
+  {
+    n: 107,
+    q: "In an elastic collision, which of the following is conserved?",
+    opts: ["Momentum only", "Both momentum and kinetic energy", "Kinetic energy only", "Only energy, not momentum"],
+    ans: 1
+  },
+  {
+    n: 108,
+    q: "Body of mass 2 kg changes its velocity from 4 m/s to 10 m/s in 3 seconds. What is the force acting on it?",
+    opts: ["2 N", "3 N", "4 N", "6 N"],
+    ans: 2
+  },
+  {
+    n: 109,
+    q: "Lenz's law is based on which fundamental law of physics?",
+    opts: ["Law of conservation of mass", "Law of conservation of momentum", "Law of conservation of energy", "Law of conservation of charge"],
+    ans: 2
+  },
+  {
+    n: 110,
+    q: "The magnetic field inside a toroid is:",
+    opts: ["Zero everywhere inside the coil", "Constant and non-zero inside the core", "Maximum at the center and zero at the edges", "Increasing from center to outer edge"],
+    ans: 1
+  },
+  {
+    n: 111,
+    q: "In which optical instrument is the focal length of the eyepiece greater than that of the objective lens?",
+    opts: ["Compound microscope", "Telescope", "Simple microscope", "Projector"],
+    ans: 0
+  },
+  {
+    n: 112,
+    q: "A body in Simple Harmonic Motion will have maximum velocity when its amplitude is:",
+    opts: ["Maximum", "Zero", "Negative maximum", "Average"],
+    ans: 1
+  },
+  {
+    n: 113,
+    q: "Diffraction of light is a special type of:",
+    opts: ["Reflection", "Refraction", "Interference", "Polarization"],
+    ans: 2
+  },
+  {
+    n: 114,
+    q: "The meter bridge is used to:",
+    opts: ["Measure the electric current in a circuit", "Measure the potential difference across a resistance", "Measure the resistance of a resistor", "Measure the power supplied in the circuit"],
+    ans: 2
+  },
+  {
+    n: 115,
+    q: "A train starts from rest with an acceleration of 4 m/s². What will be its velocity after 10 seconds?",
+    opts: ["10 m/s", "20 m/s", "30 m/s", "40 m/s"],
+    ans: 3
+  },
+  {
+    n: 116,
+    q: "A train of mass 2.06 × 10⁶ kg increases its velocity from 5 m/s to 24 m/s in 5 minutes. What is the average power delivered?",
+    opts: ["1.05 × 10⁶ W", "2.06 × 10⁶ W", "1.89 × 10⁶ W", "3.45 × 10⁶ W"],
+    ans: 2
+  },
+  {
+    n: 117,
+    q: "For resonance to occur, the vibrating body must have:",
+    opts: ["Same shape as the other object", "Same frequency as the other object", "Same nature of material", "Same amplitude as the other object"],
+    ans: 1
+  },
+  {
+    n: 118,
+    q: "When light travels from vacuum into a medium, its:",
+    opts: ["Speed increases", "Speed decreases", "Frequency increases", "Wavelength remains the same"],
+    ans: 1
+  },
+  {
+    n: 119,
+    q: "In Simple Harmonic Motion (SHM), the kinetic energy of the particle is maximum when it is at:",
+    opts: ["Mean position", "Average position", "Maximum displacement", "When velocity is zero"],
+    ans: 0
+  },
+  {
+    n: 120,
+    q: "What is the dimensional formula of specific heat capacity?",
+    opts: ["[MLT⁻²]", "[L²T⁻²θ⁻¹]", "[MT²θ]", "[M⁰L⁰T⁰]"],
+    ans: 1
+  },
+  {
+    n: 121,
+    q: "If a vector is divided by its magnitude, the result is:",
+    opts: ["A scalar", "A unit vector", "A zero vector", "A negative vector"],
+    ans: 1
+  },
+  {
+    n: 122,
+    q: "A force of 20 N is applied to overcome a frictional force of 5 N and move a 3 kg mass. What is the acceleration of the mass?",
+    opts: ["3 m/s²", "4 m/s²", "5 m/s²", "6 m/s²"],
+    ans: 2
+  },
+  {
+    n: 123,
+    q: "How much heat is required to raise the temperature of a 2 kg aluminum block from 30°C to 80°C? (Specific heat capacity of aluminum = 900 J/kg·°C)",
+    opts: ["45,000 J", "90,000 J", "18,000 J", "108,000 J"],
+    ans: 1
+  },
+  {
+    n: 124,
+    q: "In a solenoid, the magnetic field B is directly proportional to:",
+    opts: ["A", "I²", "NI", "L"],
+    ans: 2
+  },
+  {
+    n: 125,
+    q: "A moderator is used in nuclear reactors in order to:",
+    opts: ["Slow down the speed of the neutrons", "Increase the number of neutrons", "Accelerate the neutrons", "Decrease the number of neutrons"],
+    ans: 0
+  },
+  {
+    n: 126,
+    q: "The unit of Stefan-Boltzmann constant is:",
+    opts: ["Watt/cm²·K", "Watt/cm⁴·K", "Watt/cm·K⁴", "Watt/cm²·K⁴"],
+    ans: 3
+  },
+  {
+    n: 127,
+    q: "Which of the following units represents the largest amount of energy?",
+    opts: ["Electron-volt", "Erg", "Joule", "Calorie"],
+    ans: 3
+  },
+  {
+    n: 128,
+    q: "Why is the magnetic field outside an ideal toroid considered zero?",
+    opts: ["Because it has no current", "Due to cancellation of magnetic fields from symmetrical loops", "Because the core is made of non-magnetic material", "Due to strong electric field outside"],
+    ans: 1
+  },
+  {
+    n: 129,
+    q: "A 50 kg man exerts a force of 5 N and moves 3 meters in the direction of the force. What is the work done?",
+    opts: ["15 J", "150 J", "0 J", "53 J"],
+    ans: 0
+  },
+  {
+    n: 130,
+    q: "A force vector F = 3i + 4j N moves a particle from position r₁ = 2i + j m to r₂ = 5i + 3j m. What is the work done?",
+    opts: ["17 J", "13 J", "25 J", "9 J"],
+    ans: 0
+  },
+  {
+    n: 131,
+    q: "The SI unit of force per unit length between two conductors is:",
+    opts: ["N/m²", "N·m", "N/m", "J/m"],
+    ans: 2
+  },
+  {
+    n: 132,
+    q: "Vapor pressure is defined as:",
+    opts: ["The pressure applied on liquid by external air", "The pressure exerted by vapor in equilibrium with its liquid at a given temperature", "The maximum pressure a gas can exert", "The pressure inside a closed container due to compressed air"],
+    ans: 1
+  },
+  {
+    n: 133,
+    q: "Eddy currents are used for:",
+    opts: ["Measuring electric current only", "Reducing magnetic field strength", "Producing heat in metals and electromagnetic braking", "Generating sound waves"],
+    ans: 2
+  },
+  {
+    n: 134,
+    q: "Two vectors are said to be parallel if:",
+    opts: ["Their magnitudes are equal", "Their directions are same or exactly opposite", "Their dot product is zero", "Their cross product is maximum"],
+    ans: 1
+  },
+  {
+    n: 135,
+    q: "A particle of mass 2×10⁻³⁰ kg has a wave of frequency 5×10¹⁴ Hz associated with it. Using h = 6.63×10⁻³⁴ Js, what is its energy?",
+    opts: ["3.3×10⁻¹⁹ J", "2.2×10⁻²¹ J", "1.7×10⁻²² J", "4.3×10⁻²⁰ J"],
+    ans: 0
+  },
+  {
+    n: 136,
+    q: "Electron volt is the unit of:",
+    opts: ["Charge", "Current", "Energy", "Potential"],
+    ans: 2
+  },
+  {
+    n: 137,
+    q: "The electric flux through a closed spherical surface enclosing a point charge q is given by:",
+    opts: ["q/4πε₀", "qε₀", "q/ε₀", "q/2ε₀"],
+    ans: 2
+  },
+  {
+    n: 138,
+    q: "Which isotope is used in the treatment of cancer?",
+    opts: ["Cobalt-60", "Uranium-235", "Iodine-127", "Plutonium-239"],
+    ans: 0
+  },
+  {
+    n: 139,
+    q: "Capacitance of a capacitor depends on which of the following factors?",
+    opts: ["Shape and size of plates", "Nature of dielectric material", "Distance between plates", "All of the above"],
+    ans: 3
+  },
+  {
+    n: 140,
+    q: "Which of the following equations represents the Power in electrical circuits?",
+    opts: ["V = IR", "P = VI", "F = ma", "Q = It"],
+    ans: 1
+  },
+  {
+    n: 141,
+    q: "An object is moving with constant speed in a circular path. The object's centripetal acceleration remains constant in:",
+    opts: ["Magnitude only", "Both magnitude and direction", "Direction only", "Neither magnitude nor direction"],
+    ans: 0
+  },
+  {
+    n: 142,
+    q: "Assertion: Centripetal acceleration is always directed towards the center. Reason: Centripetal acceleration is a constant vector.",
+    opts: ["Both A and R are true and R is the correct explanation of A", "Both A and R are true but R is not the correct explanation of A", "A is true but R is false", "A is false but R is true"],
+    ans: 2
+  },
+  {
+    n: 143,
+    q: "Centripetal acceleration is directed towards:",
+    opts: ["The tangent of the circular path", "The axis of rotation", "The center of the circular path", "The direction of motion"],
+    ans: 2
+  },
+  {
+    n: 144,
+    q: "Compton Effect and Photoelectric Effect support which of the following?",
+    opts: ["Wave nature of light", "Dual nature of light", "Corpuscular theory of light", "Reflection of light"],
+    ans: 1
+  },
+  {
+    n: 145,
+    q: "In which of the following phenomena is the frequency of incident light directly proportional to the kinetic energy of emitted electrons?",
+    opts: ["Reflection", "Photoelectric effect", "Diffraction", "Polarization"],
+    ans: 1
+  },
+  {
+    n: 146,
+    q: "What is the length of a Galilean telescope in terms of the focal lengths of its lenses?",
+    opts: ["f₀ + fₑ", "f₀ − fₑ", "f₀ × fₑ", "f₀/fₑ"],
+    ans: 1
+  },
+  {
+    n: 147,
+    q: "The length of an astronomical telescope (in normal adjustment) is equal to:",
+    opts: ["Sum of focal lengths of objective and eyepiece lenses", "Difference of focal lengths of objective and eyepiece lenses", "Product of focal lengths of both lenses", "Ratio of focal length of objective to eyepiece"],
+    ans: 0
+  },
+  {
+    n: 148,
+    q: "An electric generator converts:",
+    opts: ["Electric energy into light energy", "Electric energy into sound energy", "Mechanical energy into electric energy", "Electric energy into mechanical energy"],
+    ans: 2
+  },
+  {
+    n: 149,
+    q: "A force of 4 N acts on an object for 2 seconds. What is the change in momentum of the object?",
+    opts: ["2 kg·m/s", "4 kg·m/s", "6 kg·m/s", "8 kg·m/s"],
+    ans: 3
+  },
+  {
+    n: 150,
+    q: "In a p-n junction, the barrier potential offers resistance to:",
+    opts: ["Free electrons in n-side and holes in p-side", "Free electrons in p-side and holes in n-side", "Only free electrons in n-side", "Only holes in p-side"],
+    ans: 0
+  }
+];
+
+const labels = ['A', 'B', 'C', 'D'];
+let correct = 0, wrong = 0, answered = 0;
+
+function updateStats() {
+  const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  document.getElementById('hdr-correct').textContent = correct;
+  document.getElementById('hdr-wrong').textContent = wrong;
+  document.getElementById('hdr-answered').textContent = answered;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = (answered / 76 * 100) + '%';
+}
+
+function buildQuiz() {
+  const root = document.getElementById('quiz-root');
+  questions.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'card-' + idx;
+
+    const header = document.createElement('div');
+    header.className = 'q-header';
+    header.innerHTML = `<span class="q-num">Q${q.n}</span><span class="q-text">${q.q}</span>`;
+    card.appendChild(header);
+
+    const optWrap = document.createElement('div');
+    optWrap.className = 'q-options';
+
+    q.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.innerHTML = `<span class="opt-label">${labels[oi]}</span><span class="opt-text">${opt}</span><span class="icon" id="icon-${idx}-${oi}"></span>`;
+      btn.addEventListener('click', () => handleAnswer(idx, oi, btn));
+      btn.id = `btn-${idx}-${oi}`;
+      optWrap.appendChild(btn);
+    });
+
+    card.appendChild(optWrap);
+
+    // feedback bar
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar';
+    fb.id = 'fb-' + idx;
+    card.appendChild(fb);
+
+    // note box
+    if (q.note) {
+      const nb = document.createElement('div');
+      nb.className = 'note-box';
+      nb.id = 'note-' + idx;
+      nb.innerHTML = '📝 ' + q.note;
+      card.appendChild(nb);
+    }
+
+    root.appendChild(card);
+  });
+}
+
+const answeredSet = new Set();
+
+function handleAnswer(idx, chosen, btn) {
+  if (answeredSet.has(idx)) return;
+  answeredSet.add(idx);
+  answered++;
+
+  const q = questions[idx];
+  const card = document.getElementById('card-' + idx);
+  const fb = document.getElementById('fb-' + idx);
+  const isCorrect = chosen === q.ans;
+
+  if (isCorrect) correct++;
+  else wrong++;
+
+  // Disable all buttons
+  q.opts.forEach((_, oi) => {
+    const b = document.getElementById(`btn-${idx}-${oi}`);
+    b.classList.add('disabled');
+
+    if (oi === q.ans) {
+      b.classList.add(chosen === q.ans && oi === chosen ? 'correct' : 'revealed-correct');
+      document.getElementById(`icon-${idx}-${oi}`).textContent = '✓';
+    }
+    if (oi === chosen && chosen !== q.ans) {
+      b.classList.add('wrong');
+      document.getElementById(`icon-${idx}-${oi}`).textContent = '✗';
+    }
+  });
+
+  // Mark chosen correct
+  if (isCorrect) {
+    document.getElementById(`btn-${idx}-${chosen}`).classList.remove('revealed-correct');
+    document.getElementById(`btn-${idx}-${chosen}`).classList.add('correct');
+  }
+
+  card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+
+  fb.className = 'feedback-bar show ' + (isCorrect ? 'fb-correct' : 'fb-wrong');
+  fb.innerHTML = isCorrect
+    ? `<span class="fb-icon">✅</span> Correct! Well done.`
+    : `<span class="fb-icon">❌</span> Incorrect. The correct answer is <strong>${labels[q.ans]}. ${q.opts[q.ans]}</strong>`;
+
+  if (q.note) {
+    document.getElementById('note-' + idx).classList.add('show');
+  }
+
+  updateStats();
+}
+
+buildQuiz();
+updateStats();
+</script>
+</body>
+</html>

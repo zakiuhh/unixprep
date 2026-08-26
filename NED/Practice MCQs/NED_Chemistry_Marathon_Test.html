@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NED Chemistry Marathon - Computer Based Test</title>
+<style>
+  :root{
+    --bg:#0f172a;
+    --card:#ffffff;
+    --accent:#2563eb;
+    --accent-dark:#1d4ed8;
+    --green:#16a34a;
+    --red:#dc2626;
+    --gray:#64748b;
+    --light:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:linear-gradient(135deg,#0f172a,#1e3a5f);
+    min-height:100vh;
+    color:#1e293b;
+  }
+  .wrap{
+    max-width:780px;
+    margin:0 auto;
+    padding:18px;
+  }
+  header{
+    text-align:center;
+    color:#fff;
+    padding:18px 10px 6px;
+  }
+  header h1{
+    margin:0 0 4px;
+    font-size:1.5rem;
+  }
+  header p{
+    margin:0;
+    color:#cbd5e1;
+    font-size:.9rem;
+  }
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    padding:22px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+    margin-top:16px;
+  }
+  /* ---------- START SCREEN ---------- */
+  #startScreen{ text-align:center; }
+  #startScreen h2{ margin-top:0; }
+  #startScreen p{ color:var(--gray); line-height:1.6; }
+  .start-stats{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin:18px 0;
+    flex-wrap:wrap;
+  }
+  .stat-box{
+    background:var(--light);
+    border-radius:10px;
+    padding:12px 18px;
+    min-width:100px;
+  }
+  .stat-box b{ display:block; font-size:1.4rem; color:var(--accent); }
+  .stat-box span{ font-size:.78rem; color:var(--gray); }
+  button{
+    cursor:pointer;
+    border:none;
+    border-radius:10px;
+    font-size:1rem;
+    font-weight:600;
+    padding:13px 26px;
+    transition:.15s;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+  }
+  .btn-primary:hover{ background:var(--accent-dark); }
+  .btn-secondary{
+    background:var(--light);
+    color:#1e293b;
+    margin-left:8px;
+  }
+  .btn-secondary:hover{ background:#e2e8f0; }
+
+  /* ---------- QUIZ SCREEN ---------- */
+  #quizScreen{ display:none; }
+  .progress-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+    font-size:.85rem;
+    color:var(--gray);
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .progress-bar{
+    height:8px;
+    background:var(--light);
+    border-radius:6px;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--accent),#60a5fa);
+    width:0%;
+    transition:width .25s;
+  }
+  .qnum{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    border-radius:8px;
+    padding:4px 11px;
+    font-size:.85rem;
+    margin-bottom:10px;
+  }
+  .qtext{
+    font-size:1.12rem;
+    font-weight:600;
+    line-height:1.5;
+    margin-bottom:18px;
+    color:#0f172a;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .opt{
+    text-align:left;
+    background:var(--light);
+    border:2px solid transparent;
+    border-radius:10px;
+    padding:13px 16px;
+    font-size:.98rem;
+    color:#1e293b;
+    cursor:pointer;
+    transition:.15s;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .opt:hover{ border-color:var(--accent); background:#e8f0fe; }
+  .opt .bullet{
+    flex:0 0 26px;
+    height:26px;
+    border-radius:50%;
+    background:#fff;
+    border:2px solid #cbd5e1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.78rem;
+    font-weight:700;
+    color:var(--gray);
+  }
+  .opt.selected{ border-color:var(--accent); background:#dbeafe; }
+  .opt.selected .bullet{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .opt.correct{ border-color:var(--green); background:#dcfce7; }
+  .opt.correct .bullet{ background:var(--green); color:#fff; border-color:var(--green); }
+  .opt.wrong{ border-color:var(--red); background:#fee2e2; }
+  .opt.wrong .bullet{ background:var(--red); color:#fff; border-color:var(--red); }
+  .opt.disabled{ cursor:default; }
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    margin-top:22px;
+    gap:10px;
+  }
+  .nav-row button{ flex:1; }
+  #nextBtn:disabled{
+    background:#cbd5e1;
+    cursor:not-allowed;
+  }
+  .review-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(34px,1fr));
+    gap:6px;
+    margin-top:14px;
+  }
+  .review-grid button{
+    padding:0;
+    height:34px;
+    width:34px;
+    font-size:.78rem;
+    border-radius:7px;
+    background:var(--light);
+    color:#1e293b;
+  }
+  .review-grid button.answered{ background:#bfdbfe; }
+  .review-grid button.current{ outline:2px solid var(--accent); }
+
+  /* ---------- RESULT SCREEN ---------- */
+  #resultScreen{ display:none; text-align:center; }
+  .score-circle{
+    width:150px;height:150px;border-radius:50%;
+    margin:10px auto 18px;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;
+    background:conic-gradient(var(--accent) calc(var(--pct)*1%), var(--light) 0);
+  }
+  .score-circle .inner{
+    width:120px;height:120px;border-radius:50%;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;
+  }
+  .score-circle .inner b{ font-size:1.8rem; color:var(--accent); }
+  .score-circle .inner span{ font-size:.75rem; color:var(--gray); }
+  .result-stats{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .rstat{ background:var(--light); border-radius:10px; padding:10px 16px; min-width:90px; }
+  .rstat b{ display:block; font-size:1.25rem; }
+  .rstat span{ font-size:.75rem; color:var(--gray); }
+  .rstat.correct b{ color:var(--green); }
+  .rstat.wrong b{ color:var(--red); }
+  .rstat.skip b{ color:var(--gray); }
+
+  #reviewList{ text-align:left; margin-top:20px; }
+  .rev-item{
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:10px;
+  }
+  .rev-item .rq{ font-weight:600; margin-bottom:6px; }
+  .rev-item .ra{ font-size:.88rem; }
+  .rev-item .ra.ok{ color:var(--green); }
+  .rev-item .ra.bad{ color:var(--red); }
+  .tag{
+    display:inline-block;
+    font-size:.7rem;
+    font-weight:700;
+    padding:2px 8px;
+    border-radius:6px;
+    margin-right:6px;
+  }
+  .tag.ok{ background:#dcfce7; color:var(--green); }
+  .tag.bad{ background:#fee2e2; color:var(--red); }
+  .tag.skip{ background:#e2e8f0; color:var(--gray); }
+  footer{
+    text-align:center;
+    color:#94a3b8;
+    font-size:.78rem;
+    padding:18px 0 8px;
+  }
+  @media (max-width:480px){
+    .qtext{ font-size:1.02rem; }
+    .stat-box{ min-width:80px; padding:10px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🧪 NED Chemistry Marathon</h1>
+    <p>Interactive Computer Based Test (CBT) — 131 MCQs</p>
+  </header>
+
+  <div class="card" id="startScreen">
+    <h2>Test Shuru Karen</h2>
+    <p>Yeh test aap ke NED Chemistry Marathon notes se banaya gaya hai. Har sawaal ke 4 options hain, ek sahi (jo aap ke notes mein highlighted tha) aur 3 naye options sawaal ke mutabiq banaye gaye hain.</p>
+    <div class="start-stats">
+      <div class="stat-box"><b id="totalQCount">0</b><span>Total Questions</span></div>
+      <div class="stat-box"><b>MCQs</b><span>Type</span></div>
+      <div class="stat-box"><b>Untimed</b><span>Mode</span></div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Test Shuru Karen ▶</button>
+  </div>
+
+  <div class="card" id="quizScreen">
+    <div class="progress-row">
+      <span id="progressText">Question 1 / 131</span>
+      <span id="scoreLive">Score: 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="qnum" id="qNumBadge">Q1</div>
+    <div class="qtext" id="qText"></div>
+    <div class="options" id="optionsBox"></div>
+
+    <div class="nav-row">
+      <button class="btn-secondary" id="prevBtn" onclick="prevQuestion()">◀ Pichla</button>
+      <button class="btn-primary" id="nextBtn" onclick="nextQuestion()">Agla ▶</button>
+    </div>
+
+    <details style="margin-top:18px;">
+      <summary style="cursor:pointer;color:#64748b;font-size:.85rem;">Sab sawalat dekhain (jump karne ke liye)</summary>
+      <div class="review-grid" id="jumpGrid"></div>
+    </details>
+
+    <div class="nav-row">
+      <button class="btn-secondary" style="flex:1" onclick="confirmFinish()">🏁 Test Khatam Karen</button>
+    </div>
+  </div>
+
+  <div class="card" id="resultScreen">
+    <h2>Aap ka Result</h2>
+    <div class="score-circle" id="scoreCircle" style="--pct:0;">
+      <div class="inner">
+        <b id="pctText">0%</b>
+        <span id="scoreFrac">0 / 131</span>
+      </div>
+    </div>
+    <div class="result-stats">
+      <div class="rstat correct"><b id="correctCount">0</b><span>Sahi</span></div>
+      <div class="rstat wrong"><b id="wrongCount">0</b><span>Ghalat</span></div>
+      <div class="rstat skip"><b id="skipCount">0</b><span>Chooti hui</span></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-primary" onclick="restartQuiz()">🔁 Dobara Den</button>
+      <button class="btn-secondary" onclick="toggleReview()">📋 Review Dekhain</button>
+    </div>
+    <div id="reviewList" style="display:none;"></div>
+  </div>
+
+  <footer>NED Chemistry Marathon Notes se banaya gaya • Made with care</footer>
+</div>
+
+<script>
+const QUESTIONS = [{"id": 1, "q": "Bayer's method is used in purification of bauxite ore when:", "options": ["Bauxite ore is pure Al2O3", "Bauxite ore contains excess of SiO2", "Bauxite ore contains excess of TiO2", "Bauxite ore contains excess of Fe2O3"], "answer": "Bauxite ore contains excess of Fe2O3"}, {"id": 2, "q": "Benzene shows saturated nature due to:", "options": ["Absence of double bonds", "Hybridization of carbon being sp3", "Delocalization of pi electrons", "Presence of single bonds only"], "answer": "Delocalization of pi electrons"}, {"id": 3, "q": "Which statement is INCORRECT about haloform reaction?", "options": ["It is used to distinguish between ethanol and acetone", "It works with methyl ketones", "It gives a yellow precipitate of iodoform", "It is used to distinguish between ethane and ethyne"], "answer": "It is used to distinguish between ethane and ethyne"}, {"id": 4, "q": "First law of thermodynamics can be written as:", "options": ["E = q - w", "E = w - q", "E = q + w", "E = q × w"], "answer": "E = q + w"}, {"id": 5, "q": "The solution which tends to resist any change in pH of solution is:", "options": ["Saturated solution", "Colloidal solution", "Standard solution", "Buffer solution"], "answer": "Buffer solution"}, {"id": 6, "q": "Basic buffer solution is made of:", "options": ["Weak acid & strong base", "Strong acid & strong base", "Weak acid & weak base", "Strong acid & weak base"], "answer": "Strong acid & weak base"}, {"id": 7, "q": "Which statement is INCONSISTENT about isotopes?", "options": ["Number of protons is same", "Atomic number is same", "Mass number is same", "Chemical properties are same"], "answer": "Mass number is same"}, {"id": 8, "q": "What is true about Group III-A elements?", "options": ["They have low melting points", "They are highly reactive metals", "They have high density", "They are all gases"], "answer": "They have high density"}, {"id": 9, "q": "Which of the following molecules will undergo Cannizzaro reaction?", "options": ["Formaldehyde", "Acetone", "Acetaldehyde", "Propionaldehyde"], "answer": "Formaldehyde"}, {"id": 10, "q": "Oxidation state of Cr in K2Cr2O7 is:", "options": ["+4", "+7", "+6", "+3"], "answer": "+6"}, {"id": 11, "q": "Na2CO3 is prepared by:", "options": ["Haber process", "Castner-Kellner process", "Contact process", "Solvay process"], "answer": "Solvay process"}, {"id": 12, "q": "The formula that provides only the ratio of atoms is called:", "options": ["Electronic formula", "Structural formula", "Molecular formula", "Empirical formula / Simplest formula"], "answer": "Empirical formula / Simplest formula"}, {"id": 13, "q": "Bonding common between NaOH & NH4OH is:", "options": ["Coordinate covalent", "Only ionic", "Ionic & covalent", "Only covalent"], "answer": "Ionic & covalent"}, {"id": 14, "q": "Benzene shows reaction of:", "options": ["Nucleophilic substitution", "Free radical addition", "Only electrophilic substitution", "Electrophilic addition & substitution"], "answer": "Electrophilic addition & substitution"}, {"id": 15, "q": "Minimum hydration energy is found in which element?", "options": ["K+", "Li+", "Cs+", "Na+"], "answer": "K+"}, {"id": 16, "q": "Which statement is true?", "options": ["H = PV - E", "H = E + PV", "H = E × PV", "H = E - PV"], "answer": "H = E + PV"}, {"id": 17, "q": "Which bond has more ionic character?", "options": ["H-Cl", "H-I", "H-Br", "H-F"], "answer": "H-F"}, {"id": 18, "q": "Which molecule has central atom containing a lone pair?", "options": ["CH4", "SiH4", "PH3", "BF3"], "answer": "PH3"}, {"id": 19, "q": "KMnO4 is ___ in nature:", "options": ["Catalytic agent", "Neutral agent", "Reducing agent", "Oxidizing agent"], "answer": "Oxidizing agent"}, {"id": 20, "q": "Vitamin C is mostly found in:", "options": ["Fresh fruits", "Dairy products", "Meat products", "Cereals"], "answer": "Fresh fruits"}, {"id": 21, "q": "KCl is a/an:", "options": ["Ionic compound", "Coordinate compound", "Metallic compound", "Covalent compound"], "answer": "Ionic compound"}, {"id": 22, "q": "Lactones are carboxylic acid compounds in which:", "options": ["Carbon atom & oxygen atom present in ring", "Two oxygen atoms present in chain", "Nitrogen atom present in ring", "Only carbon atoms present in ring"], "answer": "Carbon atom & oxygen atom present in ring"}, {"id": 23, "q": "When alkyl halide reacts with sodium metal, this reaction is called:", "options": ["Friedel-Crafts reaction", "Williamson synthesis", "Cannizzaro reaction", "Wurtz reaction"], "answer": "Wurtz reaction"}, {"id": 24, "q": "When alcohol reacts with Grignard's reagent, it produces:", "options": ["Alkyne", "Ester", "Alkane", "Alkene"], "answer": "Alkane"}, {"id": 25, "q": "Haloform reaction does not distinguish between:", "options": ["Primary & secondary alcohol", "Ketone & Aldehyde", "Ethanol & Methanol", "Acid & ester"], "answer": "Ketone & Aldehyde"}, {"id": 26, "q": "Cellulose is a:", "options": ["Animal fiber", "Mineral fiber", "Vegetable fiber", "Synthetic fiber"], "answer": "Vegetable fiber"}, {"id": 27, "q": "NaOH is prepared by which process?", "options": ["Contact process", "Haber process", "Solvay process", "Castner-Kellner cell"], "answer": "Castner-Kellner cell"}, {"id": 28, "q": "Colour of glass is imparted by addition of:", "options": ["Metal carbonates", "Metal nitrates", "Metal oxides", "Metal sulphates"], "answer": "Metal oxides"}, {"id": 29, "q": "Most abundant alkali metal is:", "options": ["Cesium", "Potassium", "Sodium", "Lithium"], "answer": "Sodium"}, {"id": 30, "q": "Arrhenius equation is written as:", "options": ["K = Ae^(-Ea/RT)", "K = Ae^(+Ea/RT)", "K = A/e^(-Ea/RT)", "K = A - e^(-Ea/RT)"], "answer": "K = Ae^(-Ea/RT)"}, {"id": 31, "q": "If I2(g) → 2I(g) + 150 J, what should be done to increase rate of reaction?", "options": ["Increase in pressure", "Decrease in temperature", "Add a catalyst", "Increase in temperature"], "answer": "Decrease in temperature"}, {"id": 32, "q": "Hydrogen at the time of its generation exists as:", "options": ["Nascent H", "Ionic H+", "Molecular H2", "Atomic H"], "answer": "Nascent H"}, {"id": 33, "q": "A chemical process in which elements have same masses and same ratio obeys which law?", "options": ["Law of definite proportion", "Law of multiple proportion", "Law of conservation of mass", "Law of reciprocal proportion"], "answer": "Law of definite proportion"}, {"id": 34, "q": "Number of sigma bonds present in benzene:", "options": ["6", "15", "12", "9"], "answer": "12"}, {"id": 35, "q": "In Le Chatelier's principle, addition of heat in an exothermic reaction will:", "options": ["Shift reaction forward", "Have no effect on reaction", "Shift reaction backward", "Stop the reaction"], "answer": "Shift reaction backward"}, {"id": 36, "q": "Amino acids are:", "options": ["Acidic", "Basic", "Neutral", "Amphoteric"], "answer": "Amphoteric"}, {"id": 37, "q": "C3H4 is similar to this compound:", "options": ["C2H4", "C2H2", "C2H6", "C3H6"], "answer": "C2H2"}, {"id": 38, "q": "Which elements are most similar (diagonal relationship)?", "options": ["Li & Mg", "Be & Al", "Na & K", "Li & Na"], "answer": "Li & Mg"}, {"id": 39, "q": "Alkyl halide reaction with sodium metal produces:", "options": ["Alkene", "Higher alkane (Wurtz reaction)", "Alcohol", "Alkyne"], "answer": "Higher alkane (Wurtz reaction)"}, {"id": 40, "q": "Graham's law tells about:", "options": ["Pressure of gases", "Rate of effusion of liquids", "Rate of reaction of gases", "Rate of diffusion of gases"], "answer": "Rate of diffusion of gases"}, {"id": 41, "q": "Chloropropane has how many positional isomers?", "options": ["4", "1", "2", "3"], "answer": "2"}, {"id": 42, "q": "Group 13 elements have same ___ in their ground state:", "options": ["Ionization energy", "Atomic radius", "Valence electrons", "Electronegativity"], "answer": "Valence electrons"}, {"id": 43, "q": "Most non-metals are present in which part of periodic table?", "options": ["Lower right of periodic table", "Lower left of periodic table", "Center of periodic table", "Upper right of periodic table"], "answer": "Upper right of periodic table"}, {"id": 44, "q": "Reaction of alcohol & acetic acid is called:", "options": ["Oxidation", "Esterification", "Hydrolysis", "Saponification"], "answer": "Esterification"}, {"id": 45, "q": "It is not easy to attack a bulky alkyl group because of:", "options": ["High electronegativity", "Steric hindrance & resistance b/c of bulky molecule", "Strong covalent bond", "Low reactivity of halide"], "answer": "Steric hindrance & resistance b/c of bulky molecule"}, {"id": 46, "q": "In second period, left to right, which property decreases?", "options": ["Atomic size & electron affinity", "Metallic character & electropositivity", "Non-metallic character", "Electronegativity & ionization energy"], "answer": "Metallic character & electropositivity"}, {"id": 47, "q": "How many elements are there in actinide series?", "options": ["16", "15", "13", "14"], "answer": "14"}, {"id": 48, "q": "Cement has maximum composition of:", "options": ["Silica", "Alumina", "Lime (CaO)", "Gypsum"], "answer": "Lime (CaO)"}, {"id": 49, "q": "Rate of reaction is independent of:", "options": ["Catalyst", "Pressure", "Concentration", "Temperature"], "answer": "Pressure"}, {"id": 50, "q": "In order to increase rate of reaction of solid to gas, which should NOT be done?", "options": ["Heat the reaction", "Increase surface area", "Add catalyst", "Cool down the reaction"], "answer": "Cool down the reaction"}, {"id": 51, "q": "Highest amount of hydrogen atom in atmosphere is found in:", "options": ["Clouds", "Earth's crust", "Oceans", "Stars"], "answer": "Stars"}, {"id": 52, "q": "Monomers of bakelite are:", "options": ["Ethylene & Propylene", "Vinyl chloride & Acetylene", "Styrene & Butadiene", "Formaldehyde & Phenol"], "answer": "Formaldehyde & Phenol"}, {"id": 53, "q": "Long chain of ketones and aldehydes have general formula:", "options": ["CnH2nO", "CnH2nO2", "CnH2n-2O", "CnH2n+2O"], "answer": "CnH2nO"}, {"id": 54, "q": "A compound containing fixed elements combined in a fixed proportion is the statement of:", "options": ["Law of definite proportion", "Law of conservation of mass", "Avogadro's law", "Law of multiple proportion"], "answer": "Law of definite proportion"}, {"id": 55, "q": "Addition of HCN in carbonyl compound is:", "options": ["Nucleophilic substitution reaction", "Nucleophilic addition reaction", "Free radical addition reaction", "Electrophilic addition reaction"], "answer": "Nucleophilic addition reaction"}, {"id": 56, "q": "Planck's constant value is:", "options": ["6.63 × 10⁻³⁴ J.s", "3.0 × 10⁸ J.s", "6.02 × 10²³ J.s", "1.6 × 10⁻¹⁹ J.s"], "answer": "6.63 × 10⁻³⁴ J.s"}, {"id": 57, "q": "Cement has maximum composition of:", "options": ["Lime", "Silica", "Magnesia", "Alumina"], "answer": "Lime"}, {"id": 58, "q": "Nitric acid is a/an:", "options": ["Reducing agent", "Dehydrating agent only", "Neutral agent", "Oxidizing agent"], "answer": "Oxidizing agent"}, {"id": 59, "q": "Nitric acid in acidic medium acts as:", "options": ["Reducing agent", "Catalytic agent", "Oxidizing agent only", "Nitrating agent"], "answer": "Nitrating agent"}, {"id": 60, "q": "Real gas obeys gas laws at:", "options": ["Low pressure & low temperature", "Low pressure & high temperature", "High pressure & high temperature", "High pressure & low temperature"], "answer": "Low pressure & high temperature"}, {"id": 61, "q": "Real gas obeys:", "options": ["Ideal gas law strictly", "Boyle's law strictly", "Charles's law strictly", "Graham's law"], "answer": "Graham's law"}, {"id": 62, "q": "At which temperature does water have particles with greater average K.E than water at 30°C?", "options": ["25°C", "100°C", "95°C", "50°C"], "answer": "95°C"}, {"id": 63, "q": "Most abundant alkali metal is:", "options": ["K", "Cs", "Na", "Li"], "answer": "Na"}, {"id": 64, "q": "The power of an atom to attract the shared pair of electrons towards itself is called:", "options": ["Electronegativity", "Electron affinity", "Electropositivity", "Ionization energy"], "answer": "Electronegativity"}, {"id": 65, "q": "Which element is considered most electronegative (as per notes)?", "options": ["K", "Cs", "Na", "F"], "answer": "Cs"}, {"id": 66, "q": "If the rate of reaction is independent of concentration, the reaction may be:", "options": ["Second order", "First order", "Zero order", "Third order"], "answer": "Zero order"}, {"id": 67, "q": "Kc = 10⁻⁴ suggests the reaction:", "options": ["Goes to completion", "Is very fast", "Is very difficult / produces very little product", "Produces equal reactants and products"], "answer": "Is very difficult / produces very little product"}, {"id": 68, "q": "In π-π overlapping, what type of orbitals are used?", "options": ["d-orbitals", "Hybrid orbitals", "Molecular orbitals", "Atomic orbitals"], "answer": "Atomic orbitals"}, {"id": 69, "q": "Na reacts more readily with water than Li because:", "options": ["It is more electropositive", "It is less reactive", "It has smaller atomic size", "It has higher ionization energy"], "answer": "It is more electropositive"}, {"id": 70, "q": "KMnO4 is:", "options": ["Reducing agent & acidic", "Oxidizing agent & Neutral", "Oxidizing agent & acidic", "Reducing agent & basic"], "answer": "Oxidizing agent & Neutral"}, {"id": 71, "q": "d-block compounds with unpaired electrons show a specific property called:", "options": ["Ferromagnetism", "Diamagnetism", "Non-magnetism", "Paramagnetism"], "answer": "Paramagnetism"}, {"id": 72, "q": "The conversion of acetic acid into methane is an example of:", "options": ["Oxidation", "Esterification", "Decarboxylation", "Hydrolysis"], "answer": "Decarboxylation"}, {"id": 73, "q": "Substance which increases mechanical strength of plastic is:", "options": ["Stabilizers", "Pigments", "Fillers", "Plasticizers"], "answer": "Fillers"}, {"id": 74, "q": "Water molecules reacting with ions of salts is called:", "options": ["Dehydration", "Hydrolysis", "Neutralization", "Hydration"], "answer": "Hydrolysis"}, {"id": 75, "q": "In acidic medium, amino acid becomes:", "options": ["Zwitterion only", "Positively charged", "Negatively charged", "Neutral"], "answer": "Positively charged"}, {"id": 76, "q": "Water present in industrial alcohol (ethanol) is typically:", "options": ["100% ethanol, 0% water", "85% ethanol, 15% water", "90% ethanol, 10% water", "95% ethanol, 5% water"], "answer": "95% ethanol, 5% water"}, {"id": 77, "q": "Na3AlF6 is the chemical formula of:", "options": ["Bauxite", "Corundum", "Feldspar", "Cryolite"], "answer": "Cryolite"}, {"id": 78, "q": "Which orbitals are co-planar?", "options": ["sp3 & sp", "sp3 & sp2", "sp & sp3", "sp2 & sp"], "answer": "sp2 & sp"}, {"id": 79, "q": "Riboflavin is also known as:", "options": ["Vitamin B2", "Vitamin B3 (Niacin)", "Vitamin B1 (Thiamine)", "Vitamin B6 (Pyridoxine)"], "answer": "Vitamin B2"}, {"id": 80, "q": "Chlorophenol has how many positional isomers?", "options": ["One", "Two", "Four", "Three"], "answer": "Two"}, {"id": 81, "q": "When ethanol reacts with excess of Cu & Ca(OH)2, the final product is:", "options": ["Formaldehyde", "Acetaldehyde", "Acetone", "Acetic acid"], "answer": "Acetaldehyde"}, {"id": 82, "q": "The weakest intermolecular force is:", "options": ["London dispersion force", "Dipole-dipole force", "Hydrogen bonding", "Ion-dipole force"], "answer": "London dispersion force"}, {"id": 83, "q": "Which ion has minimum enthalpy of hydration?", "options": ["Rb+", "K+", "Li+", "Na+"], "answer": "Rb+"}, {"id": 84, "q": "Baking soda is the common name of:", "options": ["NaOH", "Na2CO3.10H2O", "NaHCO3", "Na2CO3"], "answer": "NaHCO3"}, {"id": 85, "q": "Lanthanide series has how many elements?", "options": ["16", "13", "14", "15"], "answer": "14"}, {"id": 86, "q": "Ligands are:", "options": ["Electron pair acceptor", "Proton acceptor", "Electron pair donor", "Proton donor"], "answer": "Electron pair donor"}, {"id": 87, "q": "Isopropyl alcohol when oxidized gives:", "options": ["Acetaldehyde", "Acetone", "Formaldehyde", "Acetic acid"], "answer": "Acetone"}, {"id": 88, "q": "HCl contains:", "options": ["Ionic bond", "Coordinate bond", "Non-polar covalent bond", "Polar covalent bond"], "answer": "Polar covalent bond"}, {"id": 89, "q": "Which is NOT an open chain compound?", "options": ["Saturated", "Alicyclic", "Aromatic", "Aliphatic"], "answer": "Aromatic"}, {"id": 90, "q": "Most abundant element in Group III-A is:", "options": ["Ga", "Al", "In", "B"], "answer": "Al"}, {"id": 91, "q": "Acid present in aqua regia is:", "options": ["HF", "HCl", "H2SO4", "HNO3 only"], "answer": "HCl"}, {"id": 92, "q": "Vegetable fiber among the following is:", "options": ["Nylon", "Silk", "Wool", "Cotton"], "answer": "Cotton"}, {"id": 93, "q": "Down's process is used to manufacture:", "options": ["Ca", "K", "Na", "Mg"], "answer": "Na"}, {"id": 94, "q": "Brine is an aqueous solution of:", "options": ["Sodium chloride", "Sodium hydroxide", "Sodium sulphate", "Sodium carbonate"], "answer": "Sodium chloride"}, {"id": 95, "q": "Why are aryl halides less reactive than alkyl halides?", "options": ["Resonance stability of aryl halides", "Lower electronegativity of halogen", "Steric hindrance", "Higher bond energy of C-X bond"], "answer": "Resonance stability of aryl halides"}, {"id": 96, "q": "Compound present in maximum quantity in ordinary Portland cement is:", "options": ["Alumina (Al2O3)", "Calcium oxide (CaO)", "Silica (SiO2)", "Gypsum (CaSO4)"], "answer": "Calcium oxide (CaO)"}, {"id": 97, "q": "DDT is a/an:", "options": ["Herbicide", "Fertilizer", "Fungicide", "Insecticide"], "answer": "Insecticide"}, {"id": 98, "q": "Basic buffer solution can be formed by mixing:", "options": ["HCl + NaCl", "NaOH + NaCl", "CH3COOH + CH3COONa", "NH4OH + NH4Cl"], "answer": "NH4OH + NH4Cl"}, {"id": 99, "q": "Polyhydroxy aldehyde & ketone are:", "options": ["Vitamins", "Proteins", "Carbohydrates", "Lipids"], "answer": "Carbohydrates"}, {"id": 100, "q": "Ligands are:", "options": ["Bronsted acid", "Lewis acid", "Bronsted base", "Lewis base"], "answer": "Lewis base"}, {"id": 101, "q": "Ethyl chloride with aqueous KOH gives:", "options": ["Diethyl ether", "Ethylene", "Ethanol", "Acetylene"], "answer": "Ethanol"}, {"id": 102, "q": "Ionic salt in water is present in the form of:", "options": ["Free ions", "Hydrated ions", "Colloidal particles", "Molecules"], "answer": "Hydrated ions"}, {"id": 103, "q": "Non-metallic compound is present in which part of periodic table?", "options": ["Lower left", "Upper right", "Lower right", "Center"], "answer": "Upper right"}, {"id": 104, "q": "Buffer solution resists the change in:", "options": ["Volume", "pH", "Concentration", "Temperature"], "answer": "pH"}, {"id": 105, "q": "What is the end product of Tollen's reagent test?", "options": ["Red precipitate", "Black precipitate", "Blue solution", "Silver mirror"], "answer": "Silver mirror"}, {"id": 106, "q": "Bauxite is purified by which of these processes?", "options": ["Ostwald, Haber, Solvay process", "Baeyer's, Serpeck's, Hall's process", "Solvay, Haber, Contact process", "Castner-Kellner, Down's, Contact process"], "answer": "Baeyer's, Serpeck's, Hall's process"}, {"id": 107, "q": "The ability of carbon to form long chain compounds is called:", "options": ["Allotropy", "Isomerism", "Catenation", "Hybridization"], "answer": "Catenation"}, {"id": 108, "q": "Which hydride is electron deficient?", "options": ["CH4", "BH3", "NH3", "H2O"], "answer": "BH3"}, {"id": 109, "q": "Rate of aqueous reaction for aqueous state is independent of:", "options": ["Pressure", "Temperature", "Catalyst", "Concentration"], "answer": "Concentration"}, {"id": 110, "q": "EDTA is a ___ ligand:", "options": ["Monodentate", "Tridentate", "Hexadentate", "Bidentate"], "answer": "Hexadentate"}, {"id": 111, "q": "Palmitic acid is a/an:", "options": ["Carboxylic acid only", "Amino acid", "Fatty acid", "Nucleic acid"], "answer": "Fatty acid"}, {"id": 112, "q": "Glass containing CuO gives colour:", "options": ["Light blue", "Yellow", "Red", "Green"], "answer": "Light blue"}, {"id": 113, "q": "Long open chain compound is called:", "options": ["Aromatic", "Aliphatic", "Alicyclic", "Heterocyclic"], "answer": "Aliphatic"}, {"id": 114, "q": "Amino acid has how many functional groups?", "options": ["One", "Three", "Four", "Two"], "answer": "Two"}, {"id": 115, "q": "Down's cell is used for production of:", "options": ["Calcium metal", "Aluminium metal", "Potassium metal", "Sodium metal"], "answer": "Sodium metal"}, {"id": 116, "q": "Which of the following is an aromatic compound?", "options": ["Cyclohexane", "Hexane", "Naphthalene", "Cyclopentane"], "answer": "Naphthalene"}, {"id": 117, "q": "Number of functional groups in amino acid:", "options": ["Four", "Two", "One", "Three"], "answer": "Two"}, {"id": 118, "q": "NaHCO3 is known as:", "options": ["Sodium carbonate", "Sodium sulphate", "Sodium bicarbonate", "Sodium hydroxide"], "answer": "Sodium bicarbonate"}, {"id": 119, "q": "Long chain carboxylic acid compounds are called:", "options": ["Esters", "Nucleic acids", "Amino acids", "Fatty acids"], "answer": "Fatty acids"}, {"id": 120, "q": "Alkyl halide on treatment with KOH gives:", "options": ["Alcohols", "Alkynes", "Alkenes", "Alkanes"], "answer": "Alkenes"}, {"id": 121, "q": "Hydrogen forms salt-like hydrides from elements of:", "options": ["Group VI-A & VII-A", "Group I-A & II-A", "Transition metals", "Group III-A & IV-A"], "answer": "Group I-A & II-A"}, {"id": 122, "q": "The number of elements in each lanthanide & actinide series are:", "options": ["14", "18", "10", "15"], "answer": "14"}, {"id": 123, "q": "Nitrogen is more stable due to:", "options": ["Fully filled p-orbitals", "Half filled p-orbitals", "Empty p-orbitals", "High electronegativity"], "answer": "Half filled p-orbitals"}, {"id": 124, "q": "Ionic salt in water is present in the form of:", "options": ["Free ion", "Colloid", "Hydration ion", "Molecule"], "answer": "Hydration ion"}, {"id": 125, "q": "Benzene can cause:", "options": ["Lung cancer", "Skin cancer", "Blood cancer", "Liver damage only"], "answer": "Blood cancer"}, {"id": 126, "q": "Chlorobenzene is used in:", "options": ["Haber process", "Contact process", "Dow's process", "Solvay process"], "answer": "Dow's process"}, {"id": 127, "q": "Crystals with the strongest force of attraction are:", "options": ["Metallic crystals", "Ionic crystals", "Covalent crystals", "Molecular crystals"], "answer": "Ionic crystals"}, {"id": 128, "q": "Which compound will give haloform test positive?", "options": ["Formic acid", "Phenol", "Ethanol", "Methanol"], "answer": "Ethanol"}, {"id": 129, "q": "Reaction of alcohol with acetic acid gives:", "options": ["Ester (Ethyl acetate)", "Aldehyde", "Ether", "Acid anhydride"], "answer": "Ester (Ethyl acetate)"}, {"id": 130, "q": "Which gas behaves most ideally at room temperature?", "options": ["SO2", "NH3", "CO2", "H2"], "answer": "H2"}, {"id": 131, "q": "Which statement is INCORRECT about Rutherford's atomic model?", "options": ["Nucleus has negative charge", "Nucleus is positively charged", "Electrons revolve around nucleus", "Most of atom is empty space"], "answer": "Nucleus has negative charge"}]
+;
+
+let current = 0;
+let answers = new Array(QUESTIONS.length).fill(null); // stores chosen option string or null
+
+const totalQCount = document.getElementById('totalQCount');
+totalQCount.textContent = QUESTIONS.length;
+
+function startQuiz(){
+  document.getElementById('startScreen').style.display='none';
+  document.getElementById('quizScreen').style.display='block';
+  buildJumpGrid();
+  renderQuestion();
+}
+
+function buildJumpGrid(){
+  const grid = document.getElementById('jumpGrid');
+  grid.innerHTML='';
+  QUESTIONS.forEach((q,i)=>{
+    const b = document.createElement('button');
+    b.textContent = i+1;
+    b.id = 'jump-'+i;
+    b.onclick = ()=>{ current=i; renderQuestion(); };
+    grid.appendChild(b);
+  });
+}
+
+function updateJumpGrid(){
+  QUESTIONS.forEach((q,i)=>{
+    const b = document.getElementById('jump-'+i);
+    b.classList.toggle('answered', answers[i]!==null);
+    b.classList.toggle('current', i===current);
+  });
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  document.getElementById('qNumBadge').textContent = 'Q'+(current+1);
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('progressText').textContent = `Question ${current+1} / ${QUESTIONS.length}`;
+  document.getElementById('progressFill').style.width = ((current+1)/QUESTIONS.length*100)+'%';
+
+  const liveScore = answers.reduce((acc,a,i)=> acc + (a===QUESTIONS[i].answer?1:0), 0);
+  document.getElementById('scoreLive').textContent = 'Score: '+liveScore;
+
+  const box = document.getElementById('optionsBox');
+  box.innerHTML='';
+  const chosen = answers[current];
+  const letters=['A','B','C','D'];
+
+  q.options.forEach((opt,idx)=>{
+    const div = document.createElement('div');
+    div.className='opt';
+    if(chosen){
+      div.classList.add('disabled');
+      if(opt===q.answer) div.classList.add('correct');
+      else if(opt===chosen) div.classList.add('wrong');
+    }
+    div.innerHTML = `<span class="bullet">${letters[idx]}</span><span>${opt}</span>`;
+    if(!chosen){
+      div.onclick = ()=> selectOption(opt);
+    }
+    box.appendChild(div);
+  });
+
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').textContent = current===QUESTIONS.length-1 ? 'Result Dekhain 🏁' : 'Agla ▶';
+  updateJumpGrid();
+}
+
+function selectOption(opt){
+  answers[current]=opt;
+  renderQuestion();
+}
+
+function nextQuestion(){
+  if(current===QUESTIONS.length-1){
+    showResult();
+    return;
+  }
+  current++;
+  renderQuestion();
+}
+
+function prevQuestion(){
+  if(current>0){
+    current--;
+    renderQuestion();
+  }
+}
+
+function confirmFinish(){
+  const unanswered = answers.filter(a=>a===null).length;
+  if(unanswered>0){
+    if(!confirm(`Aap ke ${unanswered} sawal abhi tak unanswered hain. Kya aap test khatam karna chahte hain?`)) return;
+  }
+  showResult();
+}
+
+function showResult(){
+  document.getElementById('quizScreen').style.display='none';
+  document.getElementById('resultScreen').style.display='block';
+
+  let correct=0, wrong=0, skip=0;
+  QUESTIONS.forEach((q,i)=>{
+    if(answers[i]===null) skip++;
+    else if(answers[i]===q.answer) correct++;
+    else wrong++;
+  });
+
+  const pct = Math.round(correct/QUESTIONS.length*100);
+  document.getElementById('scoreCircle').style.setProperty('--pct', pct);
+  document.getElementById('pctText').textContent = pct+'%';
+  document.getElementById('scoreFrac').textContent = correct+' / '+QUESTIONS.length;
+  document.getElementById('correctCount').textContent = correct;
+  document.getElementById('wrongCount').textContent = wrong;
+  document.getElementById('skipCount').textContent = skip;
+
+  buildReviewList();
+}
+
+function buildReviewList(){
+  const list = document.getElementById('reviewList');
+  list.innerHTML='';
+  QUESTIONS.forEach((q,i)=>{
+    const chosen = answers[i];
+    const div = document.createElement('div');
+    div.className='rev-item';
+    let tag, ans;
+    if(chosen===null){
+      tag = '<span class="tag skip">SKIPPED</span>';
+      ans = `<div class="ra bad">Sahi jawab: ${q.answer}</div>`;
+    } else if(chosen===q.answer){
+      tag = '<span class="tag ok">CORRECT</span>';
+      ans = `<div class="ra ok">Aap ka jawab: ${chosen}</div>`;
+    } else {
+      tag = '<span class="tag bad">WRONG</span>';
+      ans = `<div class="ra bad">Aap ka jawab: ${chosen}</div><div class="ra ok">Sahi jawab: ${q.answer}</div>`;
+    }
+    div.innerHTML = `<div class="rq">${tag} Q${i+1}. ${q.q}</div>${ans}`;
+    list.appendChild(div);
+  });
+}
+
+function toggleReview(){
+  const list = document.getElementById('reviewList');
+  list.style.display = list.style.display==='none' ? 'block' : 'none';
+}
+
+function restartQuiz(){
+  current=0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  document.getElementById('resultScreen').style.display='none';
+  document.getElementById('startScreen').style.display='block';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physics MCQ Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f1a;
+    --surface: #141724;
+    --card: #1a1f35;
+    --border: #252b45;
+    --accent: #6c8eff;
+    --accent2: #a78bfa;
+    --correct: #22d3a0;
+    --wrong: #f43f5e;
+    --text: #e8ecf5;
+    --muted: #6b7394;
+    --gold: #f5c842;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px 0;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #0d0f1a 0%, #141030 50%, #0d1a2a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 24px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(108,142,255,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(108,142,255,0.12);
+    border: 1px solid rgba(108,142,255,0.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #e8ecf5 30%, #6c8eff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  /* SCOREBOARD */
+  .scoreboard {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 24px 20px 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .score-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 24px;
+    text-align: center;
+    min-width: 110px;
+    flex: 1;
+    max-width: 180px;
+  }
+  .score-card .label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .score-card .value {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+  }
+  .score-card.total .value { color: var(--accent); }
+  .score-card.correct .value { color: var(--correct); }
+  .score-card.wrong .value { color: var(--wrong); }
+  .score-card.remaining .value { color: var(--gold); }
+
+  /* PROGRESS */
+  .progress-wrap {
+    max-width: 900px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+  }
+  .progress-bar-bg {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 6px;
+  }
+
+  /* QUIZ CONTAINER */
+  .quiz {
+    max-width: 900px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 28px 24px;
+    transition: border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .q-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .q-card.answered::before { opacity: 1; }
+  .q-card.answered { border-color: rgba(108,142,255,0.3); }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .q-num {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    min-width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-align: center;
+    line-height: 1.2;
+    padding: 4px;
+  }
+  .q-text {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.65;
+    color: var(--text);
+    padding-top: 10px;
+  }
+
+  /* OPTIONS */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+    text-align: left;
+    width: 100%;
+    position: relative;
+  }
+  .opt:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: rgba(108,142,255,0.07);
+    transform: translateX(3px);
+  }
+  .opt-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .opt-text { flex: 1; line-height: 1.5; }
+  .opt-icon {
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+
+  /* States */
+  .opt.correct {
+    background: rgba(34,211,160,0.1);
+    border-color: var(--correct);
+    cursor: default;
+  }
+  .opt.correct .opt-letter {
+    background: var(--correct);
+    color: #fff;
+  }
+  .opt.correct .opt-icon { opacity: 1; color: var(--correct); }
+
+  .opt.wrong {
+    background: rgba(244,63,94,0.1);
+    border-color: var(--wrong);
+    cursor: default;
+  }
+  .opt.wrong .opt-letter {
+    background: var(--wrong);
+    color: #fff;
+  }
+  .opt.wrong .opt-icon { opacity: 1; color: var(--wrong); }
+
+  .opt.disabled:not(.correct):not(.wrong) {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    align-items: center;
+    gap: 10px;
+  }
+  .feedback.show { display: flex; }
+  .feedback.fb-correct {
+    background: rgba(34,211,160,0.1);
+    border: 1px solid rgba(34,211,160,0.3);
+    color: var(--correct);
+  }
+  .feedback.fb-wrong {
+    background: rgba(244,63,94,0.08);
+    border: 1px solid rgba(244,63,94,0.25);
+    color: #f87171;
+  }
+  .feedback-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* RESET BUTTON */
+  .reset-wrap {
+    text-align: center;
+    padding: 40px 20px 0;
+  }
+  .reset-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .reset-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+  @media (max-width: 600px) {
+    .q-card { padding: 20px 18px 18px; }
+    .opt { padding: 11px 14px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Physics MCQ Series</div>
+  <h1>Physics Quiz</h1>
+  <p>Questions 227–301 &nbsp;·&nbsp; Click an option to reveal the answer</p>
+</div>
+
+<div class="scoreboard">
+  <div class="score-card total"><div class="label">Total</div><div class="value" id="sc-total">75</div></div>
+  <div class="score-card correct"><div class="label">Correct</div><div class="value" id="sc-correct">0</div></div>
+  <div class="score-card wrong"><div class="label">Wrong</div><div class="value" id="sc-wrong">0</div></div>
+  <div class="score-card remaining"><div class="label">Remaining</div><div class="value" id="sc-rem">75</div></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog"></div></div>
+  <div class="progress-label" id="prog-label">0 / 75 answered</div>
+</div>
+
+<div class="quiz" id="quiz"></div>
+
+<div class="reset-wrap">
+  <button class="reset-btn" onclick="resetQuiz()">🔄 Reset Quiz</button>
+</div>
+
+<script>
+const questions = [
+  {
+    n:227, q:"The frictional force on an object in a fluid depends on:",
+    opts:["Its speed with respect to the fluid","Nature of the fluid","Shape of the object","All of the options"],
+    ans:3
+  },
+  {
+    n:228, q:"If the refractive index of a lens is increased, the power of the lens will:",
+    opts:["Increase","Decrease","Remain same","None of these"],
+    ans:0
+  },
+  {
+    n:229, q:"Power of a lens can be increased by:",
+    opts:["Increasing focal length","Decreasing refractive index","Increasing curvature (more bending of surfaces)","Making lens thicker in the middle"],
+    ans:2
+  },
+  {
+    n:230, q:"If the peak (maximum) value of an AC voltage is 311 V, what is its RMS (Root Mean Square) value?",
+    opts:["220 V","311 V","155 V","110 V"],
+    ans:0
+  },
+  {
+    n:231, q:"The fundamental frequency of an open organ pipe is 300 Hz. The first overtone of this pipe matches the first overtone of a closed organ pipe. If the speed of sound is 330 m/s, what is the length of the closed organ pipe?",
+    opts:["41 cm","37 cm","31 cm","80 cm"],
+    ans:0
+  },
+  {
+    n:232, q:"If the third harmonic of a vibrating system is 300 Hz, what is its fundamental (first harmonic) frequency?",
+    opts:["150 Hz","200 Hz","100 Hz","75 Hz"],
+    ans:2
+  },
+  {
+    n:233, q:"A whistle producing 600 cps is attached to a train moving at 30 m/s towards a stationary observer. If the speed of sound is 330 m/s, what is the apparent frequency heard by the observer?",
+    opts:["600 cps","660 cps","990 cps","330 cps"],
+    ans:1
+  },
+  {
+    n:234, q:"In Young's Double-Slit Experiment, the color that produces the minimum fringe width is:",
+    opts:["Red","Yellow","Green","Violet"],
+    ans:3
+  },
+  {
+    n:235, q:"Under what condition is the electric field at a point zero due to two charges?",
+    opts:["When charges are equal and placed at any distance","When charges are equal in magnitude and opposite in sign","When net force due to all charges at that point is zero","When distance between the charges is infinite"],
+    ans:2
+  },
+  {
+    n:236, q:"Magnetic field is possessed by:",
+    opts:["Moving charges only","Stationary charges","Neutrons","Only electric fields"],
+    ans:0
+  },
+  {
+    n:237, q:"In a parallel combination of capacitors, the potential difference across each capacitor is ___, and the charge on each capacitor is ___.",
+    opts:["The same, different","Different, the same","The same, the same","Different, different"],
+    ans:0
+  },
+  {
+    n:238, q:"Which of the following devices operates as the reverse of a heat engine?",
+    opts:["Refrigerator","Internal combustion engine","Steam turbine","Electric heater"],
+    ans:0
+  },
+  {
+    n:239, q:"According to Heisenberg's Uncertainty Principle, the product of uncertainty in position (Δx) and momentum (Δp) is equal to:",
+    opts:["h/2π","h","ħ/2","Zero"],
+    ans:2
+  },
+  {
+    n:240, q:"According to de Broglie's hypothesis, the wavelength (λ) associated with a particle is given by:",
+    opts:["λ = h·p","λ = p/h","λ = h/p","λ = h·f"],
+    ans:2
+  },
+  {
+    n:241, q:"Which of the following is a postulate of Einstein's Special Theory of Relativity?",
+    opts:["The speed of light depends on the motion of the source","Time and space are absolute","The laws of physics are the same in all inertial frames of reference","Mass remains constant at all speeds"],
+    ans:2
+  },
+  {
+    n:242, q:"A toroid has 300 turns, a radius of 15 m, and carries a current of 5 A. What is the magnetic field inside the toroid? (μ₀ = 4π × 10⁻⁷ T·m/A)",
+    opts:["1 × 10⁻⁵ T","2 × 10⁻⁵ T","3 × 10⁻⁵ T","6 × 10⁻⁴ T"],
+    ans:1
+  },
+  {
+    n:243, q:"If the mass of the bob of a simple pendulum is doubled, what happens to its time period?",
+    opts:["It becomes double","It becomes √2 times","It becomes half","It remains the same"],
+    ans:3
+  },
+  {
+    n:244, q:"The working principle of an electric motor is based on:",
+    opts:["Electrostatic force","Magnetic effect of current","Chemical reaction","Heating effect of current"],
+    ans:1
+  },
+  {
+    n:245, q:"Heat is defined as:",
+    opts:["Energy due to motion","Energy transfer due to temperature difference","Stored energy","Force applied on body"],
+    ans:1
+  },
+  {
+    n:246, q:"Thermodynamics is the study of:",
+    opts:["Motion of objects","Heat and energy conversion","Electricity","Atomic structure"],
+    ans:1
+  },
+  {
+    n:247, q:"In simple harmonic motion, kinetic energy is maximum at:",
+    opts:["Mean position","Extreme position","Half amplitude","Never maximum"],
+    ans:0
+  },
+  {
+    n:248, q:"If the distance between the Sun and the Earth is doubled, then the duration of the year will be:",
+    opts:["2 years","2√2 years","4 years","8 years"],
+    ans:1
+  },
+  {
+    n:249, q:"If the distance between the Earth and the Sun is doubled, what would be the duration of the year?",
+    opts:["365 days","366 days","730 days","1032 days"],
+    ans:3
+  },
+  {
+    n:250, q:"Which vector represents the position of an object with respect to a reference point?",
+    opts:["Force vector","Velocity vector","Displacement vector","Position vector"],
+    ans:3
+  },
+  {
+    n:251, q:"A light and a heavy object have the same momentum. Which one has more kinetic energy?",
+    opts:["The heavy object","Both have equal kinetic energy","The light object","Cannot be determined"],
+    ans:2
+  },
+  {
+    n:252, q:"A body is placed on a rough surface. A force of 20 N is applied, but the body does not move. What is the reason?",
+    opts:["The applied force is greater than friction","The surface is frictionless","Static friction balances the applied force","The body is too heavy to move"],
+    ans:2
+  },
+  {
+    n:253, q:"A satellite whose revolution speed is equal to Earth's rotation speed is called a:",
+    opts:["Polar satellite","Geostationary satellite","GPS satellite","Artificial satellite"],
+    ans:1
+  },
+  {
+    n:254, q:"A ball is projected vertically upward with a velocity of 20 m/s. What is the maximum height it reaches? (Take g = 10 m/s²)",
+    opts:["10 m","20 m","30 m","40 m"],
+    ans:1
+  },
+  {
+    n:255, q:"A projectile is thrown with a velocity of 30 m/s at an angle of 30° with the horizontal. Find the time of flight. (Take g = 10 m/s²)",
+    opts:["1.5 s","3 s","6 s","2 s"],
+    ans:1
+  },
+  {
+    n:256, q:"Destructive interference occurs when the phase difference between two waves is:",
+    opts:["0°","90°","180°","360°"],
+    ans:2
+  },
+  {
+    n:257, q:"In which of the following methods of heat transfer is no medium required?",
+    opts:["Radiation and Conduction both","Convection","Conduction","Radiation"],
+    ans:3
+  },
+  {
+    n:258, q:"The electric field between two parallel plates with opposite charges is:",
+    opts:["Zero","Non-uniform","Uniform","Maximum at the edges"],
+    ans:2
+  },
+  {
+    n:259, q:"A positively charged particle enters from left in a uniform magnetic field perpendicularly. The magnetic field is directed into the page. What will be the direction of the magnetic force on the particle?",
+    opts:["Into the page","Out of the page","To the right","Upward"],
+    ans:3
+  },
+  {
+    n:260, q:"In an RC circuit, the phase angle (φ) between voltage and current is given by:",
+    opts:["φ = tan⁻¹(R/Xc)","φ = tan⁻¹(Xc/R)","φ = tan⁻¹(1/RC)","φ = tan⁻¹(L/R)"],
+    ans:1
+  },
+  {
+    n:261, q:"In an AC generator, electrical energy is generated by:",
+    opts:["Chemical reaction","Static electricity","Rotating a coil in a magnetic field","Heating a wire"],
+    ans:2
+  },
+  {
+    n:262, q:"A body of mass 600 kg is lifted to a height of 10 m in 2 minutes. What is the work done? (Take g = 9.8 m/s²)",
+    opts:["58,800 J","60,000 J","30,000 J","120,000 J"],
+    ans:0
+  },
+  {
+    n:263, q:"If two vectors A and B are perpendicular and have equal magnitudes, then |A + B| × |A − B| is equal to:",
+    opts:["0","2|A|²","|A|²","|A|·|B|"],
+    ans:1
+  },
+  {
+    n:264, q:"In Young's double slit experiment, the fringe width is least for which colour?",
+    opts:["Red","Green","Blue","Yellow"],
+    ans:2
+  },
+  {
+    n:265, q:"In Young's double slit experiment, which of the following colours does not produce visible fringes?",
+    opts:["Yellow","Blue","Violet","Red"],
+    ans:2
+  },
+  {
+    n:266, q:"Diffraction of light is a property of:",
+    opts:["Particle nature of light","Reflection","Wave nature of light","Refraction"],
+    ans:2
+  },
+  {
+    n:267, q:"What is the relation between angular velocity (ω) and time period (T)?",
+    opts:["ω = T/2π","ω = 2πT","ω = 1/T","ω = 2π/T"],
+    ans:3
+  },
+  {
+    n:268, q:"A body of 1 gram is in free fall. What distance does it cover in 1 second?",
+    opts:["9.8 m","4.9 m","0.98 m","0.49 m"],
+    ans:1
+  },
+  {
+    n:269, q:"Which type of charge does not produce a magnetic field?",
+    opts:["Stationary charge","Moving charge","Rotating charge","Accelerated charge"],
+    ans:0
+  },
+  {
+    n:270, q:"A body in Simple Harmonic Motion will have maximum velocity when its amplitude is:",
+    opts:["Maximum","Zero","Negative maximum","Average"],
+    ans:1
+  },
+  {
+    n:271, q:"Three resistors of 80Ω, 50Ω, and 60Ω are connected in parallel. If 60V is applied across the 80Ω resistor, what is the voltage across the remaining resistors?",
+    opts:["0 V","60 V","110 V","30 V"],
+    ans:1
+  },
+  {
+    n:272, q:"Diffraction is a special type of:",
+    opts:["Reflection","Refraction","Interference","Wave bending"],
+    ans:2
+  },
+  {
+    n:273, q:"According to the law of entropy, in a spontaneous process:",
+    opts:["Entropy of the system decreases","Entropy of the universe remains constant","Entropy of the surroundings is zero","Entropy of the universe increases"],
+    ans:3
+  },
+  {
+    n:274, q:"A 10 kg boy is sitting on a carnival edge of radius 1 m. If 2 revolutions are completed in 4 seconds, what is the time period of revolution?",
+    opts:["1 sec","2 sec","4 sec","0.5 sec"],
+    ans:1
+  },
+  {
+    n:275, q:"Two masses of 7 kg and 5 kg are connected by a smooth string over a pulley, such that they both hang vertically. What is the tension in the string? (Take g = 9.8 m/s²)",
+    opts:["49 N","57.2 N","68.6 N","19.6 N"],
+    ans:1
+  },
+  {
+    n:276, q:"A simple pendulum is swinging with an amplitude θ. If the amplitude is increased and the pendulum is released from a greater angle:",
+    opts:["The period will decrease","The period will not change","The period will increase","The frequency will increase"],
+    ans:2
+  },
+  {
+    n:277, q:"A student is assigned to make a simple pendulum with time period 1 sec. He uses a string of length L, but the time period comes out to be 0.5 sec. What length should he use to get the desired time period?",
+    opts:["L/4","4L","2L","L/2"],
+    ans:1
+  },
+  {
+    n:278, q:"The glass panel used in greenhouses is known to retain:",
+    opts:["Humidity","Heat","pH","Rainfall"],
+    ans:1
+  },
+  {
+    n:279, q:"What is the main function of glass in a greenhouse?",
+    opts:["Transmit radiation from the Sun and trap heat inside","Transmit heat from low-temperature source and absorb from high-temperature source","Transmit and absorb heat equally from both sources","Reflect sunlight and emit heat"],
+    ans:0
+  },
+  {
+    n:280, q:"Which of the following is referred as 'hole' in a semiconductor?",
+    opts:["A free electron","A positively charged particle","A missing electron in the valence band","A neutron"],
+    ans:2
+  },
+  {
+    n:281, q:"The center of gravity is always:",
+    opts:["At the geometric center of the body","At the lowest point of the body","Fixed regardless of shape","The point where the entire weight of the body acts"],
+    ans:3
+  },
+  {
+    n:282, q:"A ball is projected with an initial velocity of 20 m/s at an angle of 30° with the horizontal. Find the total time of flight. (Take g = 10 m/s²)",
+    opts:["1 s","2 s","3 s","4 s"],
+    ans:1
+  },
+  {
+    n:283, q:"Momentum of a body depends upon ___.",
+    opts:["Force acting on an object","Both mass and velocity of an object","Mass of an object","Velocity of an object"],
+    ans:1
+  },
+  {
+    n:284, q:"When a body covers equal distances in equal intervals of time, its motion is said to be:",
+    opts:["Non-uniform","Uniform","Accelerated","Back and forth"],
+    ans:1
+  },
+  {
+    n:285, q:"The velocity-time graph for a body moving with uniform acceleration is:",
+    opts:["A curved line","A straight line sloping upward or downward","A horizontal line","A zig-zag line"],
+    ans:1
+  },
+  {
+    n:286, q:"A force of 10 N is applied perpendicular to a wrench at a distance of 0.5 m from the pivot. What is the torque produced?",
+    opts:["2.5 N·m","5 N·m","10 N·m","20 N·m"],
+    ans:1
+  },
+  {
+    n:287, q:"In complete (static) equilibrium, which of the following must be zero?",
+    opts:["Only net force","Both net force and net torque","Only net torque","Neither net force nor net torque"],
+    ans:1
+  },
+  {
+    n:288, q:"î·(ĵ×k̂)·î·î = ?",
+    opts:["0","1","−1","∞"],
+    ans:1
+  },
+  {
+    n:289, q:"In a vector, the angle between its rectangular components is:",
+    opts:["0°","45°","60°","90°"],
+    ans:3
+  },
+  {
+    n:290, q:"What is the dimensional formula of strain?",
+    opts:["[M¹L⁰T⁰]","[M⁰L⁰T⁰]","[M⁰L¹T⁻²]","[M⁰L⁰T¹]"],
+    ans:1
+  },
+  {
+    n:291, q:"How many seconds are there in one non-leap year?",
+    opts:["31,536,000","31,622,400","3,600,000","86,400"],
+    ans:0
+  },
+  {
+    n:292, q:"What is the dimensional formula of torque?",
+    opts:["[M¹L²T⁻²]","[M¹L¹T⁻²]","[M⁰L²T⁻²]","[M¹L²T⁻¹]"],
+    ans:0
+  },
+  {
+    n:293, q:"Boyle's Law states that at constant temperature, pressure is:",
+    opts:["∝ V","∝ 1/V","= V","∝ T"],
+    ans:1
+  },
+  {
+    n:294, q:"The slope of a velocity-time graph gives:",
+    opts:["Acceleration","Speed","Displacement","Momentum"],
+    ans:0
+  },
+  {
+    n:295, q:"The dot product of two non-zero perpendicular vectors is:",
+    opts:["1","0","−1","∞"],
+    ans:1
+  },
+  {
+    n:296, q:"The SI unit of viscosity is:",
+    opts:["Pascal","Poise","N·s/m²","kg/m³"],
+    ans:2
+  },
+  {
+    n:297, q:"Rotational kinetic energy depends on:",
+    opts:["Only mass","Moment of inertia and angular velocity","Only radius","Linear velocity and acceleration"],
+    ans:1
+  },
+  {
+    n:298, q:"The acceleration of all freely falling bodies on a planet:",
+    opts:["Increases with time","Remains constant","Decreases with time","Remains zero"],
+    ans:1
+  },
+  {
+    n:299, q:"Which one of the following statements for an object falling freely under gravity is correct?",
+    opts:["Zero acceleration always implies zero velocity","Zero acceleration has no relation with the velocity of the object","Zero velocity at any instant necessarily means zero acceleration at that instant","Acceleration is constant all throughout the free fall"],
+    ans:3
+  },
+  {
+    n:300, q:"What is the dimensional formula of angular acceleration?",
+    opts:["[M⁰L⁰T⁻¹]","[M⁰L⁰T⁻²]","[M¹L⁰T⁻²]","[M⁰L¹T⁻²]"],
+    ans:1
+  },
+  {
+    n:301, q:"Charles's Law states that at constant pressure, volume is:",
+    opts:["∝ 1/T","∝ T","∝ P","Independent of T"],
+    ans:1
+  }
+];
+
+const letters = ['A','B','C','D'];
+let correctCount = 0, wrongCount = 0, answeredCount = 0;
+const total = questions.length;
+
+function updateScore() {
+  document.getElementById('sc-correct').textContent = correctCount;
+  document.getElementById('sc-wrong').textContent = wrongCount;
+  document.getElementById('sc-rem').textContent = total - answeredCount;
+  const pct = (answeredCount / total * 100).toFixed(1);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${answeredCount} / ${total} answered`;
+}
+
+function buildQuiz() {
+  const quiz = document.getElementById('quiz');
+  quiz.innerHTML = '';
+  questions.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'card-' + qi;
+
+    const header = document.createElement('div');
+    header.className = 'q-header';
+
+    const num = document.createElement('div');
+    num.className = 'q-num';
+    num.textContent = 'Q' + q.n;
+
+    const text = document.createElement('div');
+    text.className = 'q-text';
+    text.textContent = q.q;
+
+    header.appendChild(num);
+    header.appendChild(text);
+    card.appendChild(header);
+
+    const opts = document.createElement('div');
+    opts.className = 'options';
+
+    q.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.id = `opt-${qi}-${oi}`;
+      btn.innerHTML = `
+        <span class="opt-letter">${letters[oi]}</span>
+        <span class="opt-text">${opt}</span>
+        <span class="opt-icon">${oi === q.ans ? '✓' : '✗'}</span>
+      `;
+      btn.onclick = () => selectOpt(qi, oi);
+      opts.appendChild(btn);
+    });
+
+    card.appendChild(opts);
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback';
+    fb.id = 'fb-' + qi;
+    card.appendChild(fb);
+
+    quiz.appendChild(card);
+  });
+  updateScore();
+}
+
+function selectOpt(qi, chosen) {
+  const q = questions[qi];
+  const card = document.getElementById('card-' + qi);
+  if (card.classList.contains('answered')) return;
+
+  card.classList.add('answered');
+  answeredCount++;
+
+  const isCorrect = chosen === q.ans;
+  if (isCorrect) correctCount++; else wrongCount++;
+
+  // Style all options
+  q.opts.forEach((_, oi) => {
+    const btn = document.getElementById(`opt-${qi}-${oi}`);
+    btn.classList.add('disabled');
+    if (oi === q.ans) {
+      btn.classList.add('correct');
+    } else if (oi === chosen && !isCorrect) {
+      btn.classList.add('wrong');
+    }
+  });
+
+  // Feedback
+  const fb = document.getElementById('fb-' + qi);
+  if (isCorrect) {
+    fb.className = 'feedback fb-correct show';
+    fb.innerHTML = `<span class="feedback-icon">✅</span> <span>Correct! <strong>${letters[q.ans]}. ${q.opts[q.ans]}</strong> is the right answer.</span>`;
+  } else {
+    fb.className = 'feedback fb-wrong show';
+    fb.innerHTML = `<span class="feedback-icon">❌</span> <span>Incorrect. The correct answer is <strong>${letters[q.ans]}. ${q.opts[q.ans]}</strong>.</span>`;
+  }
+
+  updateScore();
+}
+
+function resetQuiz() {
+  correctCount = 0; wrongCount = 0; answeredCount = 0;
+  buildQuiz();
+}
+
+buildQuiz();
+</script>
+</body>
+</html>

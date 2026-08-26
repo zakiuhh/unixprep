@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Physics MCQ Quiz — NED Past Papers</title>
+<style>
+  :root{
+    --bg:#0f1720;
+    --panel:#16212c;
+    --panel2:#1c2b38;
+    --ink:#eef3f7;
+    --muted:#93a4b3;
+    --accent:#3ea6ff;
+    --good:#2ecc71;
+    --good-bg:#123322;
+    --bad:#ff5c5c;
+    --bad-bg:#3a1414;
+    --border:#28394a;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:linear-gradient(180deg,#0b1218,#0f1720 40%);
+    color:var(--ink);
+    min-height:100vh;
+    padding:24px 14px 60px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  header h1{
+    font-size:1.5rem;
+    margin:0 0 6px;
+    letter-spacing:.3px;
+  }
+  header p{color:var(--muted);margin:0;font-size:.92rem;}
+
+  .progress-bar{
+    height:8px;
+    background:var(--panel2);
+    border-radius:99px;
+    overflow:hidden;
+    margin:18px 0 4px;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,#3ea6ff,#7ee787);
+    width:0%;
+    transition:width .3s ease;
+  }
+  .meta-row{
+    display:flex;justify-content:space-between;
+    font-size:.8rem;color:var(--muted);margin-bottom:18px;
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:24px 22px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  .qnum{
+    display:inline-block;
+    font-size:.72rem;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:rgba(62,166,255,.12);
+    padding:3px 10px;
+    border-radius:99px;
+    margin-bottom:12px;
+  }
+  .qtext{
+    font-size:1.12rem;
+    line-height:1.5;
+    margin:0 0 18px;
+    font-weight:600;
+  }
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    text-align:left;
+    background:var(--panel2);
+    border:1.5px solid var(--border);
+    color:var(--ink);
+    padding:13px 16px;
+    border-radius:10px;
+    font-size:.98rem;
+    cursor:pointer;
+    transition:all .15s ease;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .opt:hover:not(:disabled){border-color:var(--accent);background:#20303e;}
+  .opt:disabled{cursor:default;}
+  .opt .lab{
+    flex:0 0 auto;
+    width:22px;height:22px;
+    border-radius:50%;
+    background:#0e1a24;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.78rem;font-weight:700;color:var(--muted);
+    border:1px solid var(--border);
+  }
+  .opt.correct{background:var(--good-bg);border-color:var(--good);}
+  .opt.correct .lab{background:var(--good);color:#04240f;border-color:var(--good);}
+  .opt.wrong{background:var(--bad-bg);border-color:var(--bad);}
+  .opt.wrong .lab{background:var(--bad);color:#2b0808;border-color:var(--bad);}
+
+  .footer-row{
+    display:flex;justify-content:flex-end;
+    margin-top:18px;
+  }
+  .btn{
+    background:var(--accent);
+    color:#04141f;
+    border:none;
+    padding:10px 22px;
+    border-radius:10px;
+    font-size:.95rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .1s ease, opacity .2s;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink);
+    border:1.5px solid var(--border);
+  }
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+  .hidden{display:none !important;}
+
+  /* Results screen */
+  .score-hero{
+    text-align:center;
+    padding:10px 0 6px;
+  }
+  .score-num{
+    font-size:3rem;
+    font-weight:800;
+    background:linear-gradient(90deg,#3ea6ff,#7ee787);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .score-sub{color:var(--muted);font-size:.95rem;}
+
+  .tabs{
+    display:flex;gap:8px;margin:20px 0 14px;
+  }
+  .tab{
+    flex:1;
+    padding:10px;
+    text-align:center;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    cursor:pointer;
+    font-size:.9rem;font-weight:600;
+    color:var(--muted);
+    background:var(--panel2);
+  }
+  .tab.active{
+    color:var(--ink);
+  }
+  .tab.tab-correct.active{border-color:var(--good);background:var(--good-bg);color:var(--good);}
+  .tab.tab-wrong.active{border-color:var(--bad);background:var(--bad-bg);color:var(--bad);}
+
+  .review-item{
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px 18px;
+    margin-bottom:12px;
+  }
+  .review-item .qtext{font-size:1rem;margin-bottom:10px;}
+  .review-opt{
+    padding:8px 12px;border-radius:8px;font-size:.9rem;margin-bottom:6px;
+    display:flex;gap:8px;
+  }
+  .review-opt.correct{background:var(--good-bg);color:var(--good);}
+  .review-opt.wrong{background:var(--bad-bg);color:var(--bad);}
+  .note{
+    font-size:.78rem;color:#f5b73f;margin-top:8px;
+    background:rgba(245,183,63,.08);
+    border-left:3px solid #f5b73f;
+    padding:6px 10px;border-radius:6px;
+  }
+  .empty{
+    text-align:center;color:var(--muted);padding:30px 10px;
+  }
+  .restart-row{
+    margin-top:22px;display:flex;justify-content:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>⚛ Physics MCQ Quiz</h1>
+    <p>NED Past Papers — mixed order</p>
+  </header>
+
+  <div id="quizScreen">
+    <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+    <div class="meta-row">
+      <span id="qCounter">Question 1 / 1</span>
+      <span id="scoreLive">Score: 0</span>
+    </div>
+    <div class="card">
+      <span class="qnum" id="qBadge">Q1</span>
+      <p class="qtext" id="qText"></p>
+      <div class="options" id="optsWrap"></div>
+    </div>
+    <div class="footer-row">
+      <button class="btn" id="nextBtn" disabled>Next →</button>
+    </div>
+  </div>
+
+  <div id="resultScreen" class="hidden">
+    <div class="card">
+      <div class="score-hero">
+        <div class="score-num" id="finalScore">0/0</div>
+        <div class="score-sub" id="finalPct">0% correct</div>
+      </div>
+      <div class="tabs">
+        <div class="tab tab-correct active" id="tabCorrect">✅ Correct (<span id="cCount">0</span>)</div>
+        <div class="tab tab-wrong" id="tabWrong">❌ Incorrect (<span id="wCount">0</span>)</div>
+      </div>
+      <div id="reviewList"></div>
+    </div>
+    <div class="restart-row">
+      <button class="btn ghost" id="restartBtn">↻ Restart quiz (reshuffle)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Physics MCQ Quiz - extracted from NED Past Papers compilation
+// Each question: { q, options: [4], correct: index, note (optional, low-confidence flag) }
+const QUESTIONS = [
+{q:"A body moving in a circular path with constant speed then it has:", options:["Uniform acceleration","Nonuniform acceleration","Zero acceleration","None of these"], correct:0},
+{q:"Quanta means:", options:["Wave of energy","Proton","Packet of energy","None of these"], correct:2},
+{q:"According to Bohr's Model, the nucleus of an atom is:", options:["A positively charged dense region","A neutral Region","Negatively charged dense region","None of these"], correct:0},
+{q:"An electron starts to move with speed of light, its mass will:", options:["Become zero","Becomes Double","Becomes Half","Becomes infinite"], correct:3},
+{q:"The shunt resistance is given by:", options:["Rs=Ig·Is·Rg","Rs=(Is/Ig)Rg","Rs=(Ig/I-Ig)Rg","Rs=(Ig/I+Ig)Rg"], correct:2},
+{q:"Which of the following is equal to 1 joule?", options:["1 W·s","1 KWh","1.6×10⁻¹⁹ eV","4.2 calorie"], correct:0},
+{q:"If the mass and diameter of a sphere are doubled then its weight will become:", options:["Double","Half","Quadruple","None of these"], correct:0},
+{q:"The process of converting A.C. into D.C. is called:", options:["Inverter","Amplify","Modulation","Rectification"], correct:3},
+{q:"Transistor is used as an:", options:["Amplifier","Modulator","Electronic Switch","All of these"], correct:3},
+{q:"The deflection in a galvanometer depends upon:", options:["Current","Magnetic field strength","Area of coil","All of these"], correct:3},
+{q:"The number of photo electrons in photoelectric effect depend upon:", options:["Intensity of incident light","Frequency of Incident light","Wave length of incident light","Speed of incident light"], correct:0},
+{q:"Light year is a unit of:", options:["Frequency","Time","Mass","Distance"], correct:3},
+{q:"If two vectors are Perpendicular to each other, then their Dot product will be:", options:["Maximum","Zero","Negative","None of these"], correct:1},
+{q:"The difference between specific heat capacity at constant pressure and at constant volume of a gas equals to:", options:["R","2R","1/R","1/R²"], correct:0},
+{q:"The light emerged in Young's double slit experiment is due to:", options:["Reflection","Refraction","Polarization","Interference"], correct:3},
+{q:"The diameter of a lens is called its:", options:["Focal length","Radius of curvature","Aperture","None of these"], correct:2},
+{q:"The process in which two or more lighter nuclei joint together to form a heavy nucleus is called:", options:["Fission","Fusion","Annihilation","None of these"], correct:1},
+{q:"Three resistors of 50Ω, 30Ω and 20Ω are connected in parallel, if the voltage across 50Ω resistor is 6 volts, what is the value of voltage across other two resistors?", options:["3V","9V","6V","0V"], correct:2},
+{q:"The value of self-induction of a solenoid is given by:", options:["L = N·ΔΦ/Δi","L = N·Δi/ΔΦ","L = N·ΔΦ/Δi (same as A)","None of these"], correct:0, note:"L formula options were ambiguous in scan — double check wording"},
+{q:"Wheat stone bridge is most Sensitive when resistances P, Q, R and S are:", options:["Equal","Unequal","Proportional","None of these"], correct:0},
+{q:"IJ/C is equals to:", options:["1 watt","1 Ampere","1 second","1 Volt"], correct:3},
+{q:"Weine's displacement law states that:", options:["λmax × T = constant","λmax/T = constant","T/λmax = constant","None of these"], correct:0},
+{q:"A ball is dropped from a height, which statement about the ball is correct during this motion?", options:["Its K.E is equal to its P.E throughout","Its K.E is less than its P.E throughout","Its K.E is greater than its P.E throughout","Its sum of K.E & P.E is same throughout"], correct:3},
+{q:"If the mass and velocity of a moving object are doubled, its K.E will be:", options:["Eight times","Four times","2 times","½ times"], correct:0},
+{q:"Water is used in boilers as a cooling agent because:", options:["It is a good conductor of heat","Its heat capacity is low","Its heat capacity is high","None of these"], correct:2},
+{q:"Which of the following is a scalar quantity?", options:["Force","Electric intensity","Electromotive force","Magnetic flux density"], correct:2},
+{q:"The length of an astronomical telescope is given by:", options:["L = 2fo","L = fo/2","L = fo+fe","L = fo-fe"], correct:2},
+{q:"Sensitivity of a potentiometer depends upon:", options:["Length of wire","Value of Emf","Position of pointer","None of these"], correct:0},
+{q:"Unit of intensity of light is:", options:["Decibel","Bell","Candela","Volts"], correct:2},
+{q:"Dimensions of specific heat is:", options:["M¹L¹T²K⁰","M⁰L¹T²K⁻¹","M⁰L²T⁻²K⁰","M⁰L²T⁻²K⁻¹"], correct:3},
+{q:"Faraday's first law of electromagnetic induction is equivalent to:", options:["Law of conservation of mass","Law of conservation of momentum","Law of conservation of energy","Law of sine"], correct:2},
+{q:"When a current is drawn from a battery then the E.m.f of a battery is given by:", options:["V = E + Ir","E = V + Ir","V = Ir - E","E = V - Ir"], correct:1},
+{q:"In Compton's effect, the frequency of scattered photon is:", options:["Greater than incident photon","Equals to incident photon","Less than incident photon","Less than scattered electron"], correct:2},
+{q:"The gravitational force between two objects is 36N, if the distance between them is halved, the force will be:", options:["18N","9N","72N","144N"], correct:3},
+{q:"If frequency of a simple pendulum is 0.5 hertz, then the length of the pendulum will be:", options:["25cm","50cm","75cm","100cm"], correct:3},
+{q:"Eddy current is due to:", options:["Mutual induction","Self-induction","Resistance","None of these"], correct:3, note:"Highlighted answer in scan was 'None of these' — verify, since Eddy currents are usually attributed to changing flux/self-induction"},
+{q:"Magnetic field inside a solenoid is:", options:["Non uniform and weak","Non uniform and strong","Uniform and weak","Uniform and strong"], correct:3},
+{q:"If P type semi-conductor is connected to positive terminal of battery and N type is connected to negative terminal then its potential barrier will be:", options:["Forward Biased","Reverse Biased","Unbiased","None of these"], correct:0},
+{q:"The capacitance of a parallel plate capacitor can be increased by:", options:["Increasing area of plates","Introducing di-electric between plates","Decreasing distance between its plates","All of these"], correct:3},
+{q:"Tesla is the unit of:", options:["Magnetic flux","Magnetic flux density","Permeability","Magneto motive force"], correct:1},
+// Page 7
+{q:"Transistors are used as:", options:["Amplifier","Switch","Oscillator","All"], correct:3},
+{q:"Transformer works on the principal of:", options:["Self-induction","Mutual induction","Both","None"], correct:1},
+{q:"Which of the following represents the fringe spacing?", options:["λL/d","L/dλ","λ/dL","None"], correct:0},
+{q:"To increase the length of string two times without changing frequency, the tension in it will be:", options:["2T","4T","T/4","T/2"], correct:1},
+{q:"Vector divided by its magnitude is called:", options:["Unit vector","Free vector","Null vector","Equal vector"], correct:0},
+{q:"In compound microscope the focal length of eyepiece is ___ then the objective:", options:["Equal","Greater","Small","None"], correct:1},
+{q:"A ball thrown horizontally reaches the ground in 2 seconds. Find the distance:", options:["9.8 m","4.9 m","19.6 m","39.2 m"], correct:2},
+{q:"At what angle the torque will be maximum?", options:["0°","30°","60°","90°"], correct:3},
+{q:"Which of the following represent angular momentum?", options:["mrω²","mr²ω","m²rω","None"], correct:1},
+{q:"Which of the following represent the series resistance?", options:["Rs = (V/Ig)Rg","Rs = (Ig/V)Rg","Rs = (V/Ig) - Rg","None"], correct:2},
+{q:"Which phenomena do not support the wave theory?", options:["Young's double slit experiment","Newton's ring","Interference in thin films","Compton's effect"], correct:3},
+{q:"Moderator is used in the nuclear reactor to:", options:["Slow neutrons to continue the fission chain reaction at a constant rate","Fast neutrons to continue the fission chain reaction at a constant rate","Both","None"], correct:0},
+{q:"The reaction in which combining the lighter nuclei into heavy nuclei is called:", options:["Fission","Fusion","Both","None"], correct:1},
+{q:"Work done will be maximum if the angle between the force (F) and displacement (d) is:", options:["45°","90°","180°","0°"], correct:3},
+{q:"A field in which the work done in moving a body along a closed path is zero is called:", options:["Electric field","Conservative field","Electromagnetic field","Gravitational field"], correct:1},
+{q:"When a wave goes from one medium to another medium, which of the following characteristic of the wave remains constant?", options:["Velocity","Frequency","Wavelength","Phase"], correct:1},
+{q:"Which of the following has no effect on the speed of sound in a gas?", options:["Humidity","Pressure","Temperature","Density"], correct:1},
+{q:"The tension in the string of a simple pendulum is maximum when the bob of the pendulum is:", options:["At the extreme position","At the mean position","Midway between the mean and extreme position","Starts oscillating with very large amplitudes"], correct:1},
+{q:"A spring wrist watch keeps correct time at the equator. If it is taken to poles, then:", options:["It loses time","It keeps correct time","It gains time","It does not give correct time"], correct:2},
+{q:"The period of a simple pendulum will double if:", options:["Its length is increased to four times","The acceleration due to gravity is doubled","The mass of the bob is double","The length of the pendulum and mass of the bob are double"], correct:0},
+{q:"Two vectors A & B are acting in opposite direction. The magnitude of their resultant will be:", options:["Maximum","Minimum","No effect","None"], correct:1},
+{q:"The period of a simple pendulum is independent of:", options:["Length of the pendulum","Mass of the bob","Acceleration due to gravity","Diameter of the bob"], correct:1},
+{q:"Conductivity of super conductors is:", options:["Zero","Infinite","Minimum","None"], correct:1},
+{q:"A wire parallel to a magnetic field with current flowing in it, what is the force on it?", options:["Maximum","Zero","Both b & d","Minimum"], correct:1},
+{q:"The formula of length of Astronomical telescope is:", options:["fo + fe","fo - fe","fo/fe","fo·fe"], correct:0},
+{q:"An image is formed when object is placed between F and 2F:", options:["Real & inverted","Real & erect","Diminished","None"], correct:0},
+{q:"Rate of change of linear momentum:", options:["Impulse","Force","Torque","None"], correct:1},
+{q:"₁₃Al²⁷ + ₂He⁴ → ₀n¹ + X, where X represents:", options:["₁₁P³¹","₁₅P³⁰","₁₅P²⁹","₁₆P³²"], correct:1},
+{q:"Resistivity depends upon:", options:["Material","Mass","Length","Area"], correct:0},
+{q:"Find energy when I = 0.5 A, R = 100 Ω, t = 20 sec:", options:["50 J","100 J","250 J","500 J"], correct:2},
+{q:"Which phenomenon is not about the wave nature of light?", options:["Diffraction","Interference","Polarization","Compton's effect"], correct:3},
+// Page 9
+{q:"The helicopter of weight 3920N is moving upward with constant velocity of 4 m/s. The force acting upward is:", options:["15680 N","3920 N","980 N","None"], correct:1},
+{q:"An AC generator is connected to a transformer that supplies power at 240V and 24-watt, 24 volt bulb. The efficiency of the transformer is:", options:["14.28%","70%","28.41%","82.71%"], correct:0},
+{q:"A student performs an experiment on simple pendulum, he used a pendulum of length 'L' and got time period of 2 sec, and desired the time period of 1 sec. What length should he use?", options:["2L","4L","L/2","None"], correct:3, note:"Original marked option appeared to be d) None of these — verify exact option wording"},
+{q:"If the horizontal range of a projectile is four times its maximum height, the angle of projection will be:", options:["0°","30°","45°","60°"], correct:2, note:"low confidence - verify"},
+{q:"What will be the capacitance if the area of the plates is doubled?", options:["Doubled","Halved","One-fourth","None"], correct:0},
+{q:"If a planet existed, whose mass and radius both twice that of the earth, acceleration due to gravity at its surface would be:", options:["4.9 m/s²","19.6 m/s²","2.45 m/s²","9.8 m/s²"], correct:2},
+{q:"A body of mass 5 kg initially at rest is moved by a horizontal force of 2N covering a small displacement (s). Find the work done by the force in 10 sec:", options:["10 J","20 J","30 J","40 J"], correct:1},
+{q:"A 16 kg body is moving with a speed of 2m/s collides with a bumper of negligible mass and in 0.2 sec having stiffness of 100N/m, the compression produced in it will be:", options:["2.2 m","3.3 m","2.5 m","1.8 m"], correct:3},
+{q:"Light is proved to be transverse in nature by:", options:["Dispersion","Polarization","Diffraction","Interference"], correct:1},
+{q:"î×(j×k) gives:", options:["Charge in nuclei","Number of left nuclei","Increase in nuclei","Decrease in nuclei"], correct:1, note:"vector identity question — option text unclear in scan, verify"},
+{q:"|i×j - j×k| = ?", options:["0","1","-1","None"], correct:1, note:"low confidence, verify"},
+{q:"The principle of working of coil Galvanometer is:", options:["Force on a current carrying conductor","Torque on a current carrying coil","Mutual Induction","Motional E.M.F"], correct:1},
+{q:"Meter bridge is used to measure:", options:["E.M.F","Current","Resistance","None"], correct:2},
+{q:"Unit of intensity level is:", options:["Watt/m²","Candela","Decibel","None"], correct:2},
+{q:"The range of projectile is maximum at:", options:["30°","45°","60°","None"], correct:1},
+// Page 13
+{q:"If force exerted on a container is such that the volume is reduced to half, then the temperature of the container will:", options:["Be halved","Increase","Decrease","Depend upon the force"], correct:1},
+{q:"A particle of mass 0.5 gm moving along x axis is located at x₁ = 15 m at t₁ = 5 sec and at x₂ = 33 m at t₂ = 13 sec. Its velocity is:", options:["2.4 m/s","6 m/s","4.45 m/s","2.25 m/s"], correct:3},
+{q:"Inelastic collision:", options:["Only kinetic energy is conserved","Only momentum is conserved","Both kinetic energy and momentum are conserved","Neither K.E. nor momentum are conserved"], correct:1},
+{q:"In simple harmonic motion, velocity is maximum at:", options:["Mean position","Extreme position","Both of these","None of these"], correct:0},
+{q:"A body of mass 3 Kg is kept at a table of height 2m. It is displaced 2m horizontally. The change in P.E. will be:", options:["19.6 J","0 J","9.8 J","None"], correct:1},
+{q:"If a vector is divided by its magnitude, then the value obtained is:", options:["Unit vector","Null Vector","Free Vector","Negative vector"], correct:0},
+{q:"A force of 10N is acting at an angle 30° from +ve x axis, then its y-component is:", options:["8.66 N","0.5 N","5 N","8.66 N (dup)"], correct:1, note:"option list may be inexact - verify wording"},
+{q:"Lenz's Law is in accordance with the conservation of:", options:["Momentum","Charge","Energy","None"], correct:2},
+{q:"The dimensions of work is same as that of:", options:["Energy","Momentum","Torque","Force"], correct:0, note:"Torque also plausible answer physically, verify highlighted option"},
+{q:"An object travelling in parabolic path has constant:", options:["Terminal Velocity","Curvilinear Velocity","Horizontal Velocity","Vertical Velocity"], correct:2},
+{q:"If velocity of the body is doubled then kinetic energy and momentum will become:", options:["2 times and 4 times","4 times and 2 times","4 times and 8 times","None of these"], correct:1},
+{q:"How can three capacitors of capacitance 2 µF be arranged to get equivalent capacitance of 6 µF?", options:["Two in parallel and one in series","All in parallel","All in series","Two in series and one in parallel"], correct:1},
+// Page 14
+{q:"If a projectile is launched at 15° covers a range of 1.5m, what will be the range at 45°?", options:["0.75 m","4.5 m","1.5 m","3 m"], correct:3},
+{q:"Two forces F₁ = 3N and F₂ = 4N acting on a body of mass 2 Kg at right angles. If the body starts from rest then K.E. after 20 sec is:", options:["500 J","250 J","2500 J","5000 J"], correct:2},
+{q:"If we increase the temperature of a black body, what will be the impact on wavelength?", options:["Increases","Decreases","Remains unchanged","None of these"], correct:1},
+{q:"î·(ĵ×k̂) = ?", options:["ĵ·(k̂×î)","ĵ×(î×k̂)","ĵ·(k̂×k̂)","ĵ×(k̂×î)"], correct:0, note:"vector triple product identity - verify option lettering"},
+{q:"The work done by the system is zero in which process:", options:["Isobaric","Isothermal","Isochoric","Adiabatic"], correct:2},
+{q:"If r₁ = 2î+3ĵ-k̂ and r₂ = 4î-2ĵ-4k̂ and a force of F = 2î-6ĵ-2k̂ is applied. Find the moment of force:", options:["25 Nm","36 Nm","3 Nm","40 Nm"], correct:1},
+{q:"Eddy current is responsible for:", options:["Heating","Power loss","Energy loss","All of them"], correct:3},
+{q:"Which theory was proposed by James Clerk Maxwell?", options:["Wave particle duality","Love wave theory","Electromagnetic wave theory","None of these"], correct:2},
+{q:"Why do we apply Huygens's principle?", options:["To locate wave front","To locate momentum","To locate position","None of these"], correct:0},
+{q:"13,A 20, 30, 40 are connected in series. The current in 20 resistor is 1A. What will be the current in other resistors?", options:["0.5A, 0.5A","0.5A, 0.25A","0.5A, 0.5A (b)","2A, 2A"], correct:0, note:"low confidence - resistor values/options garbled in scan, verify"},
+];
+
+</script>
+<script>
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let quizQuestions = [];
+let current = 0;
+let answers = []; // {qIndex, chosen, correct, isCorrect}
+
+const qText = document.getElementById('qText');
+const qBadge = document.getElementById('qBadge');
+const optsWrap = document.getElementById('optsWrap');
+const nextBtn = document.getElementById('nextBtn');
+const progFill = document.getElementById('progFill');
+const qCounter = document.getElementById('qCounter');
+const scoreLive = document.getElementById('scoreLive');
+
+function initQuiz(){
+  // shuffle question order, and shuffle option order within each question
+  const base = shuffle(QUESTIONS);
+  quizQuestions = base.map(item => {
+    const optIdx = item.options.map((opt,i)=>({opt,i}));
+    const shuffled = shuffle(optIdx);
+    const newCorrectIndex = shuffled.findIndex(o => o.i === item.correct);
+    return {
+      q: item.q,
+      note: item.note || null,
+      options: shuffled.map(o=>o.opt),
+      correct: newCorrectIndex
+    };
+  });
+  current = 0;
+  answers = [];
+  document.getElementById('quizScreen').classList.remove('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const item = quizQuestions[current];
+  qBadge.textContent = 'Q' + (current+1);
+  qText.textContent = item.q;
+  qCounter.textContent = `Question ${current+1} / ${quizQuestions.length}`;
+  const correctSoFar = answers.filter(a=>a.isCorrect).length;
+  scoreLive.textContent = `Score: ${correctSoFar}`;
+  progFill.style.width = ((current)/quizQuestions.length*100) + '%';
+
+  optsWrap.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  item.options.forEach((opt, idx)=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="lab">${labels[idx]}</span><span>${opt}</span>`;
+    btn.addEventListener('click', ()=>selectOption(idx));
+    optsWrap.appendChild(btn);
+  });
+  nextBtn.disabled = true;
+  nextBtn.textContent = (current === quizQuestions.length-1) ? 'See Results →' : 'Next →';
+}
+
+function selectOption(idx){
+  const item = quizQuestions[current];
+  const isCorrect = idx === item.correct;
+  const allBtns = optsWrap.querySelectorAll('.opt');
+  allBtns.forEach((b,i)=>{
+    b.disabled = true;
+    if(i === item.correct) b.classList.add('correct');
+    if(i === idx && !isCorrect) b.classList.add('wrong');
+  });
+  answers.push({
+    q: item.q,
+    options: item.options,
+    chosenIndex: idx,
+    correctIndex: item.correct,
+    isCorrect,
+    note: item.note
+  });
+  const correctSoFar = answers.filter(a=>a.isCorrect).length;
+  scoreLive.textContent = `Score: ${correctSoFar}`;
+  nextBtn.disabled = false;
+}
+
+nextBtn.addEventListener('click', ()=>{
+  if(current < quizQuestions.length-1){
+    current++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+});
+
+function showResults(){
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+  const correct = answers.filter(a=>a.isCorrect);
+  const wrong = answers.filter(a=>!a.isCorrect);
+  document.getElementById('finalScore').textContent = `${correct.length}/${answers.length}`;
+  document.getElementById('finalPct').textContent = `${Math.round(correct.length/answers.length*100)}% correct`;
+  document.getElementById('cCount').textContent = correct.length;
+  document.getElementById('wCount').textContent = wrong.length;
+  renderReview('correct');
+}
+
+function renderReview(which){
+  document.getElementById('tabCorrect').classList.toggle('active', which==='correct');
+  document.getElementById('tabWrong').classList.toggle('active', which==='wrong');
+  const list = which==='correct' ? answers.filter(a=>a.isCorrect) : answers.filter(a=>!a.isCorrect);
+  const container = document.getElementById('reviewList');
+  container.innerHTML = '';
+  if(list.length === 0){
+    container.innerHTML = `<div class="empty">${which==='correct' ? 'No correct answers yet.' : '🎉 No incorrect answers — perfect run!'}</div>`;
+    return;
+  }
+  const labels = ['A','B','C','D'];
+  list.forEach(a=>{
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    let optsHtml = '';
+    a.options.forEach((opt,i)=>{
+      if(i === a.correctIndex){
+        optsHtml += `<div class="review-opt correct">${labels[i]}. ${opt} ✓</div>`;
+      } else if(i === a.chosenIndex && !a.isCorrect){
+        optsHtml += `<div class="review-opt wrong">${labels[i]}. ${opt} ✗ (your answer)</div>`;
+      }
+    });
+    div.innerHTML = `<p class="qtext">${a.q}</p>${optsHtml}${a.note ? `<div class="note">⚠ ${a.note}</div>` : ''}`;
+    container.appendChild(div);
+  });
+}
+
+document.getElementById('tabCorrect').addEventListener('click', ()=>renderReview('correct'));
+document.getElementById('tabWrong').addEventListener('click', ()=>renderReview('wrong'));
+document.getElementById('restartBtn').addEventListener('click', initQuiz);
+
+initQuiz();
+</script>
+</body>
+</html>
