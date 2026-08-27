@@ -38,6 +38,13 @@ Each folder above has its own README with a breakdown of what's inside and how t
 - [FAST - Entry Test](./FAST%20-%20Entry%20Test/README.md)
 - [IBA - Entry Test](./IBA%20-%20Entry%20Test/README.md)
 - [MDCAT & NUMS MDCAT](./MDCAT%20&%20NUMS%20MDCAT/README.md)
+- [MUET](./MUET/README.md)
+- [NED](./NED/README.md)
+- [NET Premium Prep Material](./NET%20Premium%20Prep%20Material/README.md)
+- [NTS - NAT](./NTS%20-%20NAT/README.md)
+- [NUST - NET](./NUST%20-%20NET/README.md)
+- [PU](./PU/README.md)
+- [UET - ECAT](./UET%20-%20ECAT/README.md)
 
 ## 🚀 How to Use This Repo
 
