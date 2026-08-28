@@ -27,6 +27,7 @@ This repo brings together past papers, subject-wise notes, MCQ banks, and prep m
 ├── NET Premium Prep Material
 ├── NTS - NAT
 ├── NUST - NET
+├── Programming Books
 ├── PU
 └── UET - ECAT
 ```
@@ -43,6 +44,7 @@ Each folder above has its own README with a breakdown of what's inside and how t
 - [NET Premium Prep Material](./NET%20Premium%20Prep%20Material/README.md)
 - [NTS - NAT](./NTS%20-%20NAT/README.md)
 - [NUST - NET](./NUST%20-%20NET/README.md)
+- [Programming Books](./Programming%20Books/README.md)
 - [PU](./PU/README.md)
 - [UET - ECAT](./UET%20-%20ECAT/README.md)
 
@@ -64,20 +66,10 @@ Got past papers, notes, or a study trick that helped you? PRs are welcome:
 
 Please only contribute material you made yourself, or that's freely and legally shareable (like official past papers). See the note below before adding anything from a paid course or platform.
 
-## ⚠️ A Note on Copyright & Responsible Sharing
-
-This project exists to help students, but that only works long-term if it doesn't get taken down. A few things worth keeping in mind:
-
-- **Past papers and original notes** (yours or contributors') are generally fine to share for educational use.
-- **Paid coaching material** — books, mock tests, or platforms from academies/companies (think KIPS, STEP, Nustempo, Nustrive, Horizon Mocks, SAP Prep Book, or similar) is copyrighted and licensed to paying customers. Hosting those files directly here is copyright infringement, even with good intentions, and puts the whole repo at risk of a takedown.
-- **Better alternative:** for those folders, link out to the official platform (with a note like "get the official version here →") instead of uploading the files. Students still find out the resource exists, the creators still get paid for their work, and your repo doesn't get flagged.
-
-When in doubt: **link, don't upload.**
-
 ## 📬 Contact
 
 Questions, corrections, or want to contribute? Open an issue or reach out via [your contact info here].
 
 ## 📄 License
 
-Original content in this repo (notes, guides, self-made MCQ sets) is shared under [choose a license, e.g. MIT] for educational use. Past papers belong to their respective testing bodies/universities and are included for study purposes only. Third-party branded material is **not** covered by any license here — see the note above.
+Original content in this repo (notes, guides, self-made MCQ sets) is shared under [choose a license, e.g. MIT] for educational use. Past papers belong to their respective testing bodies/universities and are included for study purposes only.
