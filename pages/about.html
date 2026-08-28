@@ -1,0 +1,148 @@
+<!--
+  UNI x PREP — About Page
+  ==========================
+  Lives at pages/about.html — one folder level below index.html and
+  the shared styles/ and scripts/ folders, so every relative link and
+  asset path here uses "../" to reach them. Otherwise mirrors the
+  [NAV] and [FOOTER] markup from index.html so both pages share one
+  visual shell. Styles for the cards below live in styles/style.css
+  under the [TEAM] section.
+
+  [NAV]     Same sticky nav as index.html. Tests / Beyond / Contribute
+            link back to ../index.html's sections; About links to
+            itself since it's already in this folder.
+  [TEAM]    The two team profile cards — avatar, badge, bio, expertise
+            tags, and GitHub/X links. Edit directly here to add a
+            person or change details.
+  [FOOTER]  Same footer as index.html.
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — UNI x Prep</title>
+  <meta name="description" content="The people building and maintaining UNI x Prep.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<header class="nav">
+  <div class="wrap nav-row">
+    <div class="wordmark"> <a href="../index.html">UNI <span>x</span> PREP <span>/</span> ABOUT</a></div>
+    <nav class="nav-links" id="nav-links">
+      <a href="../index.html#tests">Tests</a>
+      <a href="../index.html#beyond">Beyond the Syllabus</a>
+      <a href="about.html">About</a>
+      <a href="../index.html#contribute">Contribute</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="toggle" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+      </button>
+      <a class="icon-btn" id="repo-link-nav" href="#" target="_blank" rel="noopener" aria-label="View on GitHub" title="View on GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.11.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.05 11.05 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.8 1.18 1.83 1.18 3.09 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14 0 1.54-.01 2.79-.01 3.17 0 .3.2.66.79.55C20.21 21.38 23.5 17.08 23.5 12 23.5 5.73 18.27.5 12 .5Z"/></svg>
+      </a>
+      <button class="hamburger" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===================== TEAM [TEAM] — static cards, edit directly ===================== -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Who's behind this</div>
+        <h1>About the team</h1>
+        <p>The people building and maintaining this project.</p>
+      </div>
+
+      <div class="team-grid">
+
+        <article class="team-card">
+          <div class="team-top">
+            <div class="avatar" aria-hidden="true">Z</div>
+            <div>
+              <span class="badge"><span class="badge-dot"></span>Founder · Builder</span>
+              <h3 class="team-name">Zaki</h3>
+              <p class="team-role">COMSATS University · Designer · Engineer</p>
+            </div>
+          </div>
+          <p class="team-bio">Zaki is a student at COMSATS University. He and Zakia built UNI x Prep together — a repository where they collect, organize, and upload past papers, notes, and MCQ banks for Pakistan's biggest university entry tests, along with extra resources beyond the syllabus.</p>
+          <div class="team-stack">
+            <span class="eyebrow">Expertise &amp; Stack</span>
+            <div class="tag-row">
+              <span class="tag">Full-Stack</span>
+              <span class="tag">Next.js</span>
+              <span class="tag">React 19</span>
+              <span class="tag">TypeScript</span>
+              <span class="tag">UI/UX Architecture</span>
+              <span class="tag">Android / Capacitor</span>
+              <span class="tag">IndexedDB / Dexie</span>
+              <span class="tag">Web Audio API</span>
+            </div>
+          </div>
+          <div class="team-links">
+            <a class="btn btn-primary" href="https://github.com/zakiuhh" target="_blank" rel="noopener">GitHub — zakiuhh ↗</a>
+          </div>
+        </article>
+
+        <article class="team-card">
+          <div class="team-top">
+            <div class="avatar" aria-hidden="true">ZB</div>
+            <div>
+              <span class="badge"><span class="badge-dot"></span>Core Collaborator</span>
+              <h3 class="team-name">Zakia Batool</h3>
+              <p class="team-role">COMSATS University · UI/UX Designer · Frontend</p>
+            </div>
+          </div>
+          <p class="team-bio">Zakia is also a student at COMSATS University. Alongside Zaki, she co-built UNI x Prep and helps keep it growing — sharing and uploading content for every entry test covered in the repo, and beyond.</p>
+          <div class="team-stack">
+            <span class="eyebrow">Expertise &amp; Stack</span>
+            <div class="tag-row">
+              <span class="tag">UI/UX Design</span>
+              <span class="tag">Design Systems</span>
+              <span class="tag">Visual Craft</span>
+              <span class="tag">Frontend</span>
+              <span class="tag">Color Theory</span>
+              <span class="tag">Component Architecture</span>
+              <span class="tag">Typography</span>
+              <span class="tag">Ergonomics</span>
+            </div>
+          </div>
+          <div class="team-links">
+            <a class="btn btn-primary" href="https://github.com/batooza" target="_blank" rel="noopener">GitHub — batooza ↗</a>
+            <a class="btn btn-secondary" href="https://x.com/bat00za" target="_blank" rel="noopener">X — bat00za ↗</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer" id="contribute">
+  <div class="wrap footer-row">
+    <p>Built by students, for students.</p>
+    <a id="repo-link-footer" href="https://github.com/zakiuhh/unixprep" target="_blank" rel="noopener">Contribute on GitHub →</a>
+  </div>
+</footer>
+
+<script src="../scripts/script.js"></script>
+
+</body>
+</html>
