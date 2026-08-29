@@ -485,6 +485,43 @@ html[data-theme="dark"] .toggle .moon { display: block; }
 
 /* ===================== [RESOURCES] ===================== */
 /* Used on resources.html — search bar, latest-added strip, resource cards. */
+
+/* "Stay tuned" notice — delete this block once the resource list is fully populated */
+.notice-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: var(--accent-tint);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+}
+
+.notice-banner p {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.notice-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: notice-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes notice-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notice-dot { animation: none; }
+}
+
 .search-bar {
   display: flex;
   align-items: center;
