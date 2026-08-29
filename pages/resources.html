@@ -1,0 +1,180 @@
+<!--
+  UNI x PREP — Resources Page
+  ==========================
+  Lives at pages/resources.html — same folder as about.html, one level
+  below index.html and the shared styles/ and scripts/ folders, so
+  relative paths use "../" the same way about.html does.
+
+  [NAV]            Same sticky nav as index.html/about.html.
+  [SEARCH]         Search bar that live-filters [RESOURCE-GRID] below —
+                    matches each card's visible text plus its data-tags
+                    attribute. Logic lives in resources-script.js.
+  [LATEST]         Auto-built strip of the newest resources. To feature
+                    a card here, just add data-latest="true" to it down
+                    in [RESOURCE-GRID] — resources-script.js clones it
+                    in on page load. No need to duplicate the content by
+                    hand; keep only a handful marked "latest" at a time.
+  [RESOURCE-GRID]  The full, searchable list. Copy an
+                    <a class="resource-card"> block to add a new one —
+                    fill in data-tags (comma-separated, used by search)
+                    and data-added (YYYY-MM-DD, shown on the card).
+  [FOOTER]         Same footer as index.html/about.html.
+
+  Styles: styles/style.css, under [RESOURCES].
+  Scripts: scripts/script.js (shared nav/theme, loaded first) then
+           scripts/resources-script.js (search + latest-added logic,
+           specific to this page).
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources - UNI x Prep</title>
+  <meta name="description" content="A searchable list of extra resources for entry test prep — videos, courses, tools, and communities.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<header class="nav">
+  <div class="wrap nav-row">
+    <div class="wordmark"> <a href="../index.html">UNI <span>x</span> PREP <span>/</span> RESOURCES</a></div>
+    <nav class="nav-links" id="nav-links">
+      <a href="../index.html#tests">Tests</a>
+      <a href="../index.html#beyond">Beyond the Syllabus</a>
+      <a href="resources.html">Resources</a>
+      <a href="about.html">About</a>
+      <a href="../index.html#contribute">Contribute</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="toggle" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+      </button>
+      <a class="icon-btn" id="repo-link-nav" href="#" target="_blank" rel="noopener" aria-label="View on GitHub" title="View on GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.11.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.05 11.05 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.8 1.18 1.83 1.18 3.09 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14 0 1.54-.01 2.79-.01 3.17 0 .3.2.66.79.55C20.21 21.38 23.5 17.08 23.5 12 23.5 5.73 18.27.5 12 .5Z"/></svg>
+      </a>
+      <button class="hamburger" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="section" id="resources">
+    <div class="wrap">
+
+      <div class="section-head">
+        <div class="eyebrow">Beyond the repo</div>
+        <h1>Resource Links</h1>
+        <p>Videos, courses, tools, and communities worth bookmarking — searchable so you don't have to scroll forever.</p>
+      </div>
+
+      <!-- ===================== SEARCH [SEARCH] ===================== -->
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="resource-search" placeholder="Search resources — try “math” or “tool”" aria-label="Search resources">
+      </div>
+
+      <!-- ===================== LATEST ADDED [LATEST] — auto-built, see file-map note ===================== -->
+      <div class="latest-block" id="latest-block">
+        <span class="eyebrow">Latest added</span>
+        <div class="latest-strip" id="latest-strip"></div>
+      </div>
+
+      <!-- ===================== RESOURCE GRID [RESOURCE-GRID] — static cards, edit directly ===================== -->
+      <div class="resource-grid" id="resource-grid">
+
+        <!-- EXAMPLE resources — replace with your real links. data-tags feeds the search box. -->
+        <a class="resource-card" href="https://www.khanacademy.org" target="_blank" rel="noopener"
+           data-tags="math, physics, chemistry, video, free, course" data-added="2026-08-20" data-latest="true">
+          <div class="resource-top">
+            <span class="resource-type">Course</span>
+            <span class="resource-date">Added Aug 20</span>
+          </div>
+          <span class="card-title">Khan Academy</span>
+          <p>Free video lessons and practice problems covering Math, Physics, and Chemistry fundamentals.</p>
+        </a>
+
+        <a class="resource-card" href="https://ocw.mit.edu" target="_blank" rel="noopener"
+           data-tags="math, physics, engineering, course, free" data-added="2026-08-18" data-latest="true">
+          <div class="resource-top">
+            <span class="resource-type">Course</span>
+            <span class="resource-date">Added Aug 18</span>
+          </div>
+          <span class="card-title">MIT OpenCourseWare</span>
+          <p>Full university-level courses in math, physics, and engineering — free and self-paced.</p>
+        </a>
+
+        <a class="resource-card" href="https://www.desmos.com/calculator" target="_blank" rel="noopener"
+           data-tags="math, calculator, tool, graphing" data-added="2026-08-10" data-latest="true">
+          <div class="resource-top">
+            <span class="resource-type">Tool</span>
+            <span class="resource-date">Added Aug 10</span>
+          </div>
+          <span class="card-title">Desmos Graphing Calculator</span>
+          <p>A free online graphing calculator — handy for visualizing functions while practicing math MCQs.</p>
+        </a>
+
+        <a class="resource-card" href="https://www.freecodecamp.org" target="_blank" rel="noopener"
+           data-tags="programming, cs, course, free">
+          <div class="resource-top">
+            <span class="resource-type">Course</span>
+            <span class="resource-date">Added Jul 30</span>
+          </div>
+          <span class="card-title">freeCodeCamp</span>
+          <p>Free, self-paced programming courses — a good companion to the "Beyond the Syllabus" C++ material.</p>
+        </a>
+
+        <a class="resource-card" href="https://www.wolframalpha.com" target="_blank" rel="noopener"
+           data-tags="math, calculator, tool">
+          <div class="resource-top">
+            <span class="resource-type">Tool</span>
+            <span class="resource-date">Added Jul 15</span>
+          </div>
+          <span class="card-title">Wolfram Alpha</span>
+          <p>A computational engine for checking your work on math and physics problems step by step.</p>
+        </a>
+
+        <!-- REPLACE href="#" with your actual group/community link -->
+        <a class="resource-card" href="#" target="_blank" rel="noopener"
+           data-tags="community, discussion, group">
+          <div class="resource-top">
+            <span class="resource-type">Community</span>
+            <span class="resource-date">Added Jul 5</span>
+          </div>
+          <span class="card-title">Study Group Chat</span>
+          <p>Link your Discord, WhatsApp, or Telegram group here so students can ask questions and compare notes.</p>
+        </a>
+
+      </div>
+
+      <p class="no-results" id="no-results" hidden>No resources match "<span id="no-results-query"></span>". Try a different search.</p>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer" id="contribute">
+  <div class="wrap footer-row">
+    <p>Built by students, for students.</p>
+    <a id="repo-link-footer" href="https://github.com/zakiuhh/unixprep" target="_blank" rel="noopener">Contribute on GitHub →</a>
+  </div>
+</footer>
+
+<script src="../scripts/script.js"></script>
+<script src="../scripts/resources-script.js"></script>
+
+</body>
+</html>
