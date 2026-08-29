@@ -483,6 +483,103 @@ html[data-theme="dark"] .toggle .moon { display: block; }
 
 .team-links { display: flex; gap: 12px; flex-wrap: wrap; }
 
+/* ===================== [RESOURCES] ===================== */
+/* Used on resources.html — search bar, latest-added strip, resource cards. */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  height: 52px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 40px;
+}
+
+.search-bar svg { width: 18px; height: 18px; color: var(--ink-soft); flex-shrink: 0; }
+
+.search-bar input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.search-bar input::placeholder { color: var(--ink-soft); }
+
+/* Remove the native OS search-input clear icon so it doesn't clash with the custom look */
+.search-bar input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.latest-block { margin-bottom: 40px; }
+.latest-block .eyebrow { display: block; margin-bottom: 12px; }
+
+.latest-strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.latest-card { flex: 0 0 240px; }
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.resource-card {
+  display: block;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.resource-card:hover { border-color: var(--accent); }
+
+.resource-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.resource-type {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-tint);
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.resource-date {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.resource-card p { font-size: 13.5px; }
+
+.no-results {
+  text-align: center;
+  padding: 32px 0;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+}
+
 /* ===================== [FOOTER] ===================== */
 .footer {
   border-top: 1px solid var(--line);
@@ -554,7 +651,8 @@ html[data-theme="dark"] .toggle .moon { display: block; }
 
   .section-head { margin-bottom: 24px; }
 
-  .grid, .beyond-grid { grid-template-columns: 1fr; }
+  .grid, .beyond-grid, .resource-grid { grid-template-columns: 1fr; }
+  .latest-card { flex: 0 0 200px; }
 
   .team-card { padding: 22px; }
   .team-links .btn { flex: 1 1 auto; }
