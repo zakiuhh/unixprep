@@ -6,24 +6,17 @@
   relative paths use "../" the same way about.html does.
 
   [NAV]            Same sticky nav as index.html/about.html.
-  [SEARCH]         Search bar that live-filters [RESOURCE-GRID] below —
-                    matches each card's visible text plus its data-tags
-                    attribute. Logic lives in resources-script.js.
-  [LATEST]         Auto-built strip of the newest resources. To feature
-                    a card here, just add data-latest="true" to it down
-                    in [RESOURCE-GRID] — resources-script.js clones it
-                    in on page load. No need to duplicate the content by
-                    hand; keep only a handful marked "latest" at a time.
-  [RESOURCE-GRID]  The full, searchable list. Copy an
-                    <a class="resource-card"> block to add a new one —
-                    fill in data-tags (comma-separated, used by search)
-                    and data-added (YYYY-MM-DD, shown on the card).
+  [NOTICE]         "Stay tuned" banner — the only content shown for now.
+  [SEARCH] / [LATEST] / [RESOURCE-GRID]
+                   Currently commented out below, demo cards and all,
+                   until real resources are ready. See the comment
+                   right above that block for how to bring it back.
   [FOOTER]         Same footer as index.html/about.html.
 
   Styles: styles/style.css, under [RESOURCES].
-  Scripts: scripts/script.js (shared nav/theme, loaded first) then
-           scripts/resources-script.js (search + latest-added logic,
-           specific to this page).
+  Scripts: scripts/script.js (shared nav/theme) only, for now —
+           scripts/resources-script.js is commented out below since
+           it has nothing to operate on until [RESOURCE-GRID] returns.
 -->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -85,22 +78,28 @@
         <p>More resources are being added regularly — stay tuned!</p>
       </div>
 
-      <!-- ===================== SEARCH [SEARCH] ===================== -->
+      <!--
+        TEMPORARILY DISABLED — search bar, latest-added strip, and the
+        resource grid (with demo cards) are commented out until real
+        resources are ready. To bring this page back to life:
+          1. Uncomment the block below.
+          2. Replace the demo <a class="resource-card"> entries with
+             your real links (see [RESOURCE-GRID] comments inside).
+          3. Uncomment the resources-script.js <script> tag at the
+             bottom of this file.
+
       <div class="search-bar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input type="search" id="resource-search" placeholder="Search resources — try “math” or “tool”" aria-label="Search resources">
       </div>
 
-      <!-- ===================== LATEST ADDED [LATEST] — auto-built, see file-map note ===================== -->
       <div class="latest-block" id="latest-block">
         <span class="eyebrow">Latest added</span>
         <div class="latest-strip" id="latest-strip"></div>
       </div>
 
-      <!-- ===================== RESOURCE GRID [RESOURCE-GRID] — static cards, edit directly ===================== -->
       <div class="resource-grid" id="resource-grid">
 
-        <!-- EXAMPLE resources — replace with your real links. data-tags feeds the search box. -->
         <a class="resource-card" href="https://www.khanacademy.org" target="_blank" rel="noopener"
            data-tags="math, physics, chemistry, video, free, course" data-added="2026-08-20" data-latest="true">
           <div class="resource-top">
@@ -151,7 +150,6 @@
           <p>A computational engine for checking your work on math and physics problems step by step.</p>
         </a>
 
-        <!-- REPLACE href="#" with your actual group/community link -->
         <a class="resource-card" href="#" target="_blank" rel="noopener"
            data-tags="community, discussion, group">
           <div class="resource-top">
@@ -165,6 +163,7 @@
       </div>
 
       <p class="no-results" id="no-results" hidden>No resources match "<span id="no-results-query"></span>". Try a different search.</p>
+      -->
 
     </div>
   </section>
@@ -180,7 +179,9 @@
 </footer>
 
 <script src="../scripts/script.js"></script>
+<!-- Uncomment once the resource grid above is restored:
 <script src="../scripts/resources-script.js"></script>
+-->
 
 </body>
 </html>
