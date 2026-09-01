@@ -5,18 +5,35 @@
   below index.html and the shared styles/ and scripts/ folders, so
   relative paths use "../" the same way about.html does.
 
-  [NAV]            Same sticky nav as index.html/about.html.
-  [NOTICE]         "Stay tuned" banner — the only content shown for now.
-  [SEARCH] / [LATEST] / [RESOURCE-GRID]
-                   Currently commented out below, demo cards and all,
-                   until real resources are ready. See the comment
-                   right above that block for how to bring it back.
-  [FOOTER]         Same footer as index.html/about.html.
+  [NAV]              Same sticky nav as index.html/about.html.
+  [NOTICE]           Small "still growing" banner — remove once you feel
+                      the list is substantial enough not to need it.
+  [SEARCH]           Search bar. While you're typing, [CATEGORIES] below
+                      is hidden and [SEARCH-RESULTS] shows a flat grid
+                      of just the matching cards — no category grouping,
+                      no non-matching cards mixed in. Clearing the box
+                      switches back to the normal categorized view.
+                      Logic in resources-script.js.
+  [CATEGORIES]       The real content, and what's shown when the search
+                      box is empty: one <div class="resource-category">
+                      per category, each with a heading and its own
+                      <div class="resource-grid"> of <a class="resource-card">
+                      entries. Copy a whole category block to add a new
+                      one, or copy a single card within a category to
+                      add a resource. Fill in data-tags (comma-separated,
+                      feeds search) and data-added (YYYY-MM-DD, shown on
+                      the card). Add data-latest="true" to a card to
+                      give it a small "Latest Added" corner badge — pure
+                      CSS, no JS involved, so it still shows up correctly
+                      if that card gets cloned into a search result.
+  [SEARCH-RESULTS]   Empty by default; resources-script.js fills it with
+                      clones of matching cards while a search is active.
+  [FOOTER]           Same footer as index.html/about.html.
 
   Styles: styles/style.css, under [RESOURCES].
-  Scripts: scripts/script.js (shared nav/theme) only, for now —
-           scripts/resources-script.js is commented out below since
-           it has nothing to operate on until [RESOURCE-GRID] returns.
+  Scripts: scripts/script.js (shared nav/theme) then
+           scripts/resources-script.js (search logic, specific to this
+           page).
 -->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -72,98 +89,218 @@
         <p>Videos, courses, tools, and communities worth bookmarking — searchable so you don't have to scroll forever.</p>
       </div>
 
-      <!-- ===================== NOTICE [NOTICE] — remove once the list is fully populated ===================== -->
+      <!-- ===================== NOTICE [NOTICE] — remove once the list feels substantial ===================== -->
       <div class="notice-banner">
         <span class="notice-dot"></span>
-        <p>More resources are being added regularly — stay tuned!</p>
+        <p>This list is growing — new resources added regularly.</p>
       </div>
 
-      <!--
-        TEMPORARILY DISABLED — search bar, latest-added strip, and the
-        resource grid (with demo cards) are commented out until real
-        resources are ready. To bring this page back to life:
-          1. Uncomment the block below.
-          2. Replace the demo <a class="resource-card"> entries with
-             your real links (see [RESOURCE-GRID] comments inside).
-          3. Uncomment the resources-script.js <script> tag at the
-             bottom of this file.
-
+      <!-- ===================== SEARCH [SEARCH] ===================== -->
       <div class="search-bar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input type="search" id="resource-search" placeholder="Search resources — try “math” or “tool”" aria-label="Search resources">
       </div>
 
-      <div class="latest-block" id="latest-block">
-        <span class="eyebrow">Latest added</span>
-        <div class="latest-strip" id="latest-strip"></div>
+      <!-- ===================== CATEGORIES [CATEGORIES] — static cards, edit directly ===================== -->
+      <div class="resource-categories" id="resource-categories">
+
+        <!-- Category: copy this whole block to add a new category -->
+
+        <div class="resource-category">
+          <h2 class="category-title">Premium Material for Entry Tests</h2>
+          <div class="resource-grid">
+
+            <a class="resource-card" href="https://terabox.com/s/1oEs5NT-t06i-rU73vCbNcg" target="_blank" rel="noopener"
+               data-tags="math, entry test" data-added="2026-08-31" data-latest="true">
+              <div class="resource-top">
+                <span class="resource-type">Lectures</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">KIPS Lectures for Maths</span>
+              <p>This Folder includes recorded lectures of <b>Maths</b> by KIPS.</p>
+            </a>
+
+            <a class="resource-card" href="https://terabox.com/s/1IQXx5BJlfoggR2x85gniXw" target="_blank" rel="noopener"
+               data-tags="math, physics, engineering, course, free" data-added="2026-08-31" data-latest="false">
+              <div class="resource-top">
+                <span class="resource-type">Lectures</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">KIPS Physics Lectures</span>
+              <p>This Folder includes recorded lectures of <b>Physics</b> by KIPS.</p>
+            </a>
+
+            <a class="resource-card" href="https://drive.google.com/drive/folders/1Pej5NZxEKpzIMjSm3xaMU5i4sFyHowfX" target="_blank" rel="noopener"
+               data-tags="math, physics, engineering, course, free" data-added="2026-08-31" data-latest="false">
+              <div class="resource-top">
+                <span class="resource-type">Prep Material</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FLPs for MDCAT + Applied Science</span>
+              <p>This Folder includes <b>Full Length Papers for MDCAT and Applied Sciences.</b></p>
+            </a>
+
+            <a class="resource-card" href="https://drive.google.com/drive/folders/1-6v7y7GPLBAAvgl6GrrQFqtx4T8U_kYt" target="_blank" rel="noopener"
+               data-tags="net, nust, flp" data-added="2026-08-31" data-latest="false">
+              <div class="resource-top">
+                <span class="resource-type">Prep Material</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FLPs for NUST NET</span>
+              <p>This Folder includes <b>Full Length Papers for NUST NET.</b></p>
+            </a>
+
+          </div>
+        </div>
+
+        <div class="resource-category">
+          <h2 class="category-title">IBA</h2>
+          <div class="resource-grid">
+
+            <a class="resource-card" href="https://drive.google.com/drive/folders/1-s7BPo-rTMQ9PPto3mhzYGhdcliEkXOX" target="_blank" rel="noopener"
+               data-tags="math, physics, chemistry, video, iba, IBA Sukker, IBA" data-added="2026-08-31" data-latest="true">
+              <div class="resource-top">
+                <span class="resource-type">Folder</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">IBA Karachi / Folder-I</span>
+              <p>This Folder includes <b>English and maths content with SAT Practice Tests</b> by CoolPanda.</p>
+            </a>
+
+            <a class="resource-card" href="http://drive.google.com/drive/folders/1ToJlob9svB9ZUYqebB_ZyA5Owmhd5SUg" target="_blank" rel="noopener"
+               data-tags="math, physics, engineering, course, free" data-added="2026-08-31" data-latest="false">
+              <div class="resource-top">
+                <span class="resource-type">Folder</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">IBA Karachi / Folder-II</span>
+              <p>This Folder includes <b>SAT and Grand Papers, English and Maths Content.</b></p>
+            </a>
+
+          </div>
+        </div>
+
+        <div class="resource-category">
+          <h2 class="category-title">FAST NTS</h2>
+          <div class="resource-grid">
+
+            <a class="resource-card" href="https://youtube.com/playlist?list=PLLshazbJTbB2YQF7cYOzU9R1mpsDiAQdW&si=kSL_55KQFaM72r0Z" target="_blank" rel="noopener"
+                data-tags="fast, nuces, nts" data-latest="true">
+                <div class="resource-top">
+                    <span class="resource-type">YouTube</span>
+                    <span class="resource-date">Added Aug 31</span>
+                </div>
+                <span class="card-title">FAST NUCES Entry test 2K26</span>
+                <p>Solve FAST <b>Advanced Math</b> All Years Past Papers MCQs</b></p>
+              </a>
+
+            <a class="resource-card" href="https://youtube.com/playlist?list=PLLshazbJTbB2c8bwSKGVt-EXs2wRMknL1&si=25Q9yQQYFFuccj-G" target="_blank" rel="noopener"
+               data-tags="iq portion, iq nts,fast, nts, nat, fast nts" data-added="2026-08-10" data-latest="false">
+              <div class="resource-top">
+                <span class="resource-type">YouTube</span>
+                <span class="resource-date">Added Aug 18</span>
+              </div>
+              <span class="card-title">FAST / IQ Past Papers</span>
+              <p>In this playlist, you will get all past papers of FAST University <b>IQ Portion.</b></p>
+            </a>
+
+            <a class="resource-card" href="https://youtube.com/playlist?list=PLLshazbJTbB1rPVOA9LjZeddBJJyQtuuH&si=YIxB8yWxV28N_OHV" target="_blank" rel="noopener"
+               data-tags="basic maths">
+              <div class="resource-top">
+                <span class="resource-type">YouTube</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FAST / Basic Maths</span>
+              <p>In this playlist, you will get all past papers of FAST University <b>Basic Maths Portion.</b></p>
+            </a>
+
+            <a class="resource-card" href="https://www.youtube.com/playlist?list=PLLshazbJTbB3AmSNcWJ5-ODIwuvLSOYwh&si=YKYvlDDPLZiEAE9V" target="_blank" rel="noopener"
+               data-tags="past papers">
+              <div class="resource-top">
+                <span class="resource-type">YouTube</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FAST / Past Papers</span>
+              <p>Playlist for FAST <b>Past Papers.</b></p>
+            </a>
+
+            <a class="resource-card" href="https://youtu.be/Cm1FlFXbbBg?si=qk-ixkEvvNALBYnL" target="_blank" rel="noopener"
+               data-tags="english, endgame, past papers, fast, nts">
+              <div class="resource-top">
+                <span class="resource-type">YouTube</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FAST / English Endgame</span>
+              <p>Solve FAST Entry Test <b>English</b> Past Papers 500 MCQs with Explanation</p>
+            </a>
+
+            <a class="resource-card" href="https://youtu.be/u0zJD9s7FnI?si=MqUhMVMRuR3r99YP" target="_blank" rel="noopener"
+               data-tags="basic maths, endgame, past papers, fast, nts">
+              <div class="resource-top">
+                <span class="resource-type">YouTube</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FAST / Basic Maths Endgame</span>
+              <p>Solve FAST <b>Basic Math</b> All Years Past Papers MCQs.</b></p>
+            </a>
+
+            <a class="resource-card" href="https://youtu.be/NgZK_iUjHUA?si=m7Eh11hzk0HXNPht" target="_blank" rel="noopener"
+               data-tags="basic maths, endgame, past papers, fast, nts">
+              <div class="resource-top">
+                <span class="resource-type">YouTube</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FAST / Advanced Maths Endgame</span>
+              <p>Solve FAST <b>Advanced Math</b> All Years Past Papers MCQs</b></p>
+            </a>
+
+            <a class="resource-card" href="https://drive.google.com/drive/folders/1pWO7au8UXe_7yg30eoB30jBjK7aTyRW-?dmr=1&ec=wgc-drive-%5Bmodule%5D-goto" target="_blank" rel="noopener"
+               data-tags="basic maths, endgame, past papers, fast, nts">
+              <div class="resource-top">
+                <span class="resource-type">Folder</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FAST / NUSTrive's Basic Maths Notes</span>
+              <p>This folder contains NUSTrive's <b>Basic Maths</b> MCQs with solution.</p>
+            </a>
+
+            <a class="resource-card" href="https://drive.google.com/drive/folders/1IDRZMpFv-P7srtMy00u5UdpvyxOqRUyd?dmr=1&ec=wgc-drive-%5Bmodule%5D-goto" target="_blank" rel="noopener"
+               data-tags="basic maths, endgame, past papers, fast, nts">
+              <div class="resource-top">
+                <span class="resource-type">Folder</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">FAST / NUSTrive's Advanced Maths Notes</span>
+              <p>This folder contains <b>NUSTrive's Advanced Maths</b> MCQs with solution.</p>
+            </a>
+          </div>
+        </div>
+
+
+        <div class="resource-category">
+          <h2 class="category-title">Communities</h2>
+          <div class="resource-grid">
+
+            <!-- REPLACE href="#" with your actual group/community link -->
+            <a class="resource-card" href="#" target="_blank" rel="noopener"
+               data-tags="community, discussion, group">
+              <div class="resource-top">
+                <span class="resource-type">Community</span>
+                <span class="resource-date">Added Aug 31</span>
+              </div>
+              <span class="card-title">Study Group Chat</span>
+              <p>Link your Discord, WhatsApp, or Telegram group here so students can ask questions and compare notes.</p>
+            </a>
+
+          </div>
+        </div>
+
       </div>
 
-      <div class="resource-grid" id="resource-grid">
-
-        <a class="resource-card" href="https://www.khanacademy.org" target="_blank" rel="noopener"
-           data-tags="math, physics, chemistry, video, free, course" data-added="2026-08-20" data-latest="true">
-          <div class="resource-top">
-            <span class="resource-type">Course</span>
-            <span class="resource-date">Added Aug 20</span>
-          </div>
-          <span class="card-title">Khan Academy</span>
-          <p>Free video lessons and practice problems covering Math, Physics, and Chemistry fundamentals.</p>
-        </a>
-
-        <a class="resource-card" href="https://ocw.mit.edu" target="_blank" rel="noopener"
-           data-tags="math, physics, engineering, course, free" data-added="2026-08-18" data-latest="true">
-          <div class="resource-top">
-            <span class="resource-type">Course</span>
-            <span class="resource-date">Added Aug 18</span>
-          </div>
-          <span class="card-title">MIT OpenCourseWare</span>
-          <p>Full university-level courses in math, physics, and engineering — free and self-paced.</p>
-        </a>
-
-        <a class="resource-card" href="https://www.desmos.com/calculator" target="_blank" rel="noopener"
-           data-tags="math, calculator, tool, graphing" data-added="2026-08-10" data-latest="true">
-          <div class="resource-top">
-            <span class="resource-type">Tool</span>
-            <span class="resource-date">Added Aug 10</span>
-          </div>
-          <span class="card-title">Desmos Graphing Calculator</span>
-          <p>A free online graphing calculator — handy for visualizing functions while practicing math MCQs.</p>
-        </a>
-
-        <a class="resource-card" href="https://www.freecodecamp.org" target="_blank" rel="noopener"
-           data-tags="programming, cs, course, free">
-          <div class="resource-top">
-            <span class="resource-type">Course</span>
-            <span class="resource-date">Added Jul 30</span>
-          </div>
-          <span class="card-title">freeCodeCamp</span>
-          <p>Free, self-paced programming courses — a good companion to the "Beyond the Syllabus" C++ material.</p>
-        </a>
-
-        <a class="resource-card" href="https://www.wolframalpha.com" target="_blank" rel="noopener"
-           data-tags="math, calculator, tool">
-          <div class="resource-top">
-            <span class="resource-type">Tool</span>
-            <span class="resource-date">Added Jul 15</span>
-          </div>
-          <span class="card-title">Wolfram Alpha</span>
-          <p>A computational engine for checking your work on math and physics problems step by step.</p>
-        </a>
-
-        <a class="resource-card" href="#" target="_blank" rel="noopener"
-           data-tags="community, discussion, group">
-          <div class="resource-top">
-            <span class="resource-type">Community</span>
-            <span class="resource-date">Added Jul 5</span>
-          </div>
-          <span class="card-title">Study Group Chat</span>
-          <p>Link your Discord, WhatsApp, or Telegram group here so students can ask questions and compare notes.</p>
-        </a>
-
-      </div>
+      <!-- ===================== SEARCH RESULTS [SEARCH-RESULTS] — auto-built while searching ===================== -->
+      <div class="resource-grid" id="search-results" hidden></div>
 
       <p class="no-results" id="no-results" hidden>No resources match "<span id="no-results-query"></span>". Try a different search.</p>
-      -->
 
     </div>
   </section>
@@ -179,9 +316,7 @@
 </footer>
 
 <script src="../scripts/script.js"></script>
-<!-- Uncomment once the resource grid above is restored:
 <script src="../scripts/resources-script.js"></script>
--->
 
 </body>
 </html>
