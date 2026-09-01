@@ -32,6 +32,13 @@ html[data-theme="dark"] {
 /* ===================== [RESET] ===================== */
 * { box-sizing: border-box; }
 
+/* Browsers hide [hidden] elements by default, but any of our own
+   `display: ...` rules on that same element silently win instead —
+   author CSS beats the browser's default styling even at equal
+   specificity. This guarantees hidden really means hidden, everywhere
+   on the site (e.g. #resource-categories vs. its own `display: flex`). */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -531,7 +538,7 @@ html[data-theme="dark"] .toggle .moon { display: block; }
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  margin-bottom: 40px;
+  margin-bottom: 6px;
 }
 
 .search-bar svg { width: 18px; height: 18px; color: var(--ink-soft); flex-shrink: 0; }
@@ -552,17 +559,34 @@ html[data-theme="dark"] .toggle .moon { display: block; }
 /* Remove the native OS search-input clear icon so it doesn't clash with the custom look */
 .search-bar input::-webkit-search-cancel-button { -webkit-appearance: none; }
 
-.latest-block { margin-bottom: 40px; }
-.latest-block .eyebrow { display: block; margin-bottom: 12px; }
-
-.latest-strip {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  padding-bottom: 6px;
+.search-clear {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--ink-soft);
+  padding: 4px;
+  flex-shrink: 0;
 }
 
-.latest-card { flex: 0 0 240px; }
+.search-clear:hover { color: var(--accent); }
+
+.search-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  min-height: 1em;
+  margin: 0 2px 34px;
+}
+
+.resource-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.category-title { font-size: 20px; margin-bottom: 16px; }
 
 .resource-grid {
   display: grid;
@@ -572,6 +596,7 @@ html[data-theme="dark"] .toggle .moon { display: block; }
 
 .resource-card {
   display: block;
+  position: relative;
   padding: 20px;
   background: var(--surface);
   border: 1px solid var(--line);
@@ -579,6 +604,26 @@ html[data-theme="dark"] .toggle .moon { display: block; }
 }
 
 .resource-card:hover { border-color: var(--accent); }
+
+/* "Latest Added" corner badge — shows automatically on any card marked
+   data-latest="true" in the HTML. Pure CSS, no JS, so it still shows
+   up correctly even on cards cloned into the search-results grid. */
+.resource-card[data-latest="true"]::after {
+  content: "Latest Added";
+  position: absolute;
+  top: -9px;
+  right: 14px;
+  background: var(--accent);
+  color: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
 
 .resource-top {
   display: flex;
@@ -608,7 +653,7 @@ html[data-theme="dark"] .toggle .moon { display: block; }
   white-space: nowrap;
 }
 
-.resource-card p { font-size: 13.5px; }
+.resource-card p { font-size: 13px; }
 
 .no-results {
   text-align: center;
@@ -689,7 +734,7 @@ html[data-theme="dark"] .toggle .moon { display: block; }
   .section-head { margin-bottom: 24px; }
 
   .grid, .beyond-grid, .resource-grid { grid-template-columns: 1fr; }
-  .latest-card { flex: 0 0 200px; }
+  .resource-categories { gap: 32px; }
 
   .team-card { padding: 22px; }
   .team-links .btn { flex: 1 1 auto; }
