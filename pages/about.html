@@ -23,6 +23,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About — UNI x Prep</title>
   <meta name="description" content="The people building and maintaining UNI x Prep.">
+  <meta property="og:title" content="About — UNI x Prep">
+  <meta property="og:description" content="The people building and maintaining UNI x Prep.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#F1F3EF">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +35,8 @@
   <link rel="stylesheet" href="../styles/style.css">
 </head>
 <body>
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- ===================== NAVBAR ===================== -->
 <header class="nav">
@@ -39,8 +46,9 @@
       <a href="../index.html#tests">Tests</a>
       <a href="../index.html#beyond">Beyond the Syllabus</a>
       <a href="resources.html">Resources</a>
-      <a href="about.html">About</a>
-      <a href="../index.html#contribute">Contribute</a>
+      <a href="download.html">Download</a>
+      <a href="about.html" aria-current="page">About</a>
+      <a href="contribute.html">Contribute</a>
     </nav>
     <div class="nav-actions">
       <button class="toggle" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
@@ -59,7 +67,7 @@
   </div>
 </header>
 
-<main>
+<main id="main-content">
 
   <!-- ===================== TEAM [TEAM] — static cards, edit directly ===================== -->
   <section class="section" id="about">
@@ -80,7 +88,7 @@
               <p class="team-role">COMSATS University · Developer · Frontend</p>
             </div>
           </div>
-          <p class="team-bio">Zakia is a student at COMSATS University. Alongside 4-5 other students, she co-built UNI x Prep and helps keep it growing — sharing and uploading content for every entry test covered in the repo, and beyond.</p>
+          <p class="team-bio">Zakia is a student at COMSATS University. Alongside 4-5 other students, she co-built <b>UNI x Prep</b> and helps keep it growing — sharing and uploading content for every entry test covered in the repo, and beyond.</p>
           <div class="team-stack">
             <span class="eyebrow">Expertise &amp; Stack</span>
             <div class="tag-row">
@@ -107,10 +115,10 @@
 </main>
 
 <!-- ===================== FOOTER ===================== -->
-<footer class="footer" id="contribute">
+<footer class="footer">
   <div class="wrap footer-row">
     <p>Built by students, for students.</p>
-    <a id="repo-link-footer" href="https://github.com/zakiuhh/unixprep" target="_blank" rel="noopener">Contribute on GitHub →</a>
+    <a href="contribute.html">How to Contribute →</a>
   </div>
 </footer>
 

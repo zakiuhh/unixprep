@@ -9,7 +9,9 @@
                   below the [RESPONSIVE] breakpoint; toggled by [NAV-JS]
                   in script.js)
     [BUTTONS]     .btn-primary / .btn-secondary shared button styles
-    [HERO]        Top hero section + OMR bubble graphic
+    [HERO]        Top hero section + OMR bubble graphic. Primary button
+                  goes straight to the repo; secondary button goes to
+                  the Resources page (pages/resources.html).
     [HOW]         3-step "how it works" strip
     [SECTION]     Shared section/grid wrapper styles
     [TEST-GRID]   Static HTML cards for the 10 entry tests — edit them
@@ -18,19 +20,28 @@
     [BEYOND]      Static HTML cards for non-test bonus resources (C++,
                   books) — edit them directly below, inside
                   <div id="beyond-grid">, same as [TEST-GRID].
-    [FOOTER]      Footer
+    [FOOTER]      Footer. Its link now goes to pages/contribute.html
+                  (a full how-to-contribute guide) instead of straight
+                  to GitHub, and instead of scrolling to an in-page
+                  anchor like it used to.
     [RESPONSIVE]  All @media breakpoints (tablet + mobile), grouped at the bottom
-    [CONFIG]      JS: REPO_URL constant — only used to point the nav/hero/
-                  footer "View on GitHub" buttons at the repo root
+    [CONFIG]      JS: REPO_URL constant — points the nav "View on GitHub"
+                  icon button and the hero's primary button at the repo
+                  root. The footer button is no longer wired to this —
+                  see [FOOTER] above.
     [NAV-JS]      JS: mobile hamburger open/close logic
-    [THEME-JS]    JS: dark/light toggle logic (localStorage + system preference)
+    [THEME-JS]    JS: dark/light toggle logic. Light is the default for
+                  every first-time visitor (OS dark-mode preference is
+                  intentionally ignored) — only localStorage, once the
+                  person has actually clicked the toggle, overrides it.
 
   ADDING A NEW CARD: copy one of the <a class="card"> or <a class="beyond-card">
   blocks below and point its href at REPO_URL (set in script.js) + "/tree/main/"
   + the folder name, URL-encoded (spaces become %20, "&" becomes %26, "+" becomes %2B, etc).
 
-  Nav also links to pages/about.html and pages/resources.html — see those
-  files for their own file-maps.
+  Nav also links to pages/about.html, pages/resources.html,
+  pages/download.html, and pages/contribute.html — see those files for
+  their own file-maps.
 -->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -39,6 +50,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UNI x Prep - Free Entry Test Prep for FSc Students</title>
   <meta name="description" content="Past papers, notes, and MCQ banks for Pakistan's biggest university entry tests — organized by test, not scattered across group chats.">
+  <meta property="og:title" content="UNI x Prep — Free Entry Test Prep for FSc Students">
+  <meta property="og:description" content="Past papers, notes, and MCQ banks for Pakistan's biggest university entry tests — organized by test, not scattered across group chats.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#F1F3EF">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,6 +62,8 @@
   <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- ===================== NAVBAR ===================== -->
 <header class="nav">
@@ -55,8 +73,9 @@
       <a href="#tests">Tests</a>
       <a href="#beyond">Beyond the Syllabus</a>
       <a href="pages/resources.html">Resources</a>
+      <a href="pages/download.html">Download</a>
       <a href="pages/about.html">About</a>
-      <a href="#contribute">Contribute</a>
+      <a href="pages/contribute.html">Contribute</a>
     </nav>
     <div class="nav-actions">
       <button class="toggle" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
@@ -75,7 +94,7 @@
   </div>
 </header>
 
-<main>
+<main id="main-content">
 
   <!-- ===================== HERO ===================== -->
   <section class="hero">
@@ -86,7 +105,7 @@
         <p>Past papers, subject notes, and MCQ banks for Pakistan's biggest university entry tests — organized by test, not scattered across a dozen group chats.</p>
         <div class="hero-ctas">
           <a class="btn btn-primary" id="repo-link-hero" href="#" target="_blank" rel="noopener">Browse the Repo</a>
-          <a class="btn btn-secondary" href="#tests">See what's inside</a>
+          <a class="btn btn-secondary" href="pages/resources.html">Explore Resources</a>
         </div>
       </div>
       <div class="omr">
@@ -262,10 +281,10 @@
 </main>
 
 <!-- ===================== FOOTER ===================== -->
-<footer class="footer" id="contribute">
+<footer class="footer">
   <div class="wrap footer-row">
     <p>Built by students, for students.</p>
-    <a id="repo-link-footer" href="https://github.com/zakiuhh/unixprep" target="_blank" rel="noopener">Contribute on GitHub →</a>
+    <a href="pages/contribute.html">How to Contribute →</a>
   </div>
 </footer>
 
