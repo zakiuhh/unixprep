@@ -39,6 +39,30 @@ html[data-theme="dark"] {
    on the site (e.g. #resource-categories vs. its own `display: flex`). */
 [hidden] { display: none !important; }
 
+/* Smooth in-page scrolling for the nav's #tests / #beyond anchors */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* Skip-to-content link — invisible until a keyboard user tabs to it,
+   so it doesn't affect anyone using a mouse or touchscreen. */
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 12px;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus { top: 12px; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -124,6 +148,7 @@ p { color: var(--ink-soft); margin: 0; }
 }
 
 .nav-links a:hover { color: var(--accent); }
+.nav-links a[aria-current="page"] { color: var(--accent); }
 
 .nav-actions {
   display: flex;
@@ -653,7 +678,7 @@ html[data-theme="dark"] .toggle .moon { display: block; }
   white-space: nowrap;
 }
 
-.resource-card p { font-size: 13px; }
+.resource-card p { font-size: 13.5px; }
 
 .no-results {
   text-align: center;
@@ -661,6 +686,123 @@ html[data-theme="dark"] .toggle .moon { display: block; }
   font-family: var(--font-mono);
   font-size: 13.5px;
 }
+
+/* ===================== [GUIDE] ===================== */
+/* Used on download.html and contribute.html — numbered step methods. */
+
+.plink {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  color: inherit;
+  padding-bottom: 4px;
+}
+
+.plink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 5 L2.5 1 L5 5 L7.5 1 L10 5' stroke='%23B87F13' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 10px 6px;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.35s ease;
+}
+
+.plink:hover::after {
+  clip-path: inset(0 0 0 0);
+}
+
+.guide-intro { max-width: 62ch; }
+
+.guide-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 8px;
+}
+
+.guide-method {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+}
+
+.guide-method h2 { font-size: 20px; }
+
+.guide-best-for {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  margin: 6px 0 20px;
+}
+
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guide-step { display: flex; gap: 14px; }
+
+.guide-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  padding-top: 2px;
+  flex-shrink: 0;
+  width: 22px;
+}
+
+.guide-step p { font-size: 14.5px; }
+
+.guide-step code {
+  font-family: var(--font-mono);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.guide-note {
+  font-size: 13.5px;
+  font-style: italic;
+  margin-top: 28px;
+}
+
+.guide-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+/* Contribute page's guidelines callout — reuses .notice-banner, just
+   allows a list inside instead of a single line of text. */
+.guide-guidelines {
+  align-items: flex-start;
+  margin: 32px 0;
+}
+
+.guide-guidelines .notice-dot { margin-top: 6px; }
+.guide-guidelines p { color: var(--ink); margin-bottom: 6px; }
+
+.guide-guidelines ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+
+.guide-guidelines li { margin-bottom: 4px; }
 
 /* ===================== [FOOTER] ===================== */
 .footer {
@@ -737,6 +879,9 @@ html[data-theme="dark"] .toggle .moon { display: block; }
   .resource-categories { gap: 32px; }
 
   .team-card { padding: 22px; }
+  .guide-method { padding: 20px; }
+  .guide-cta { flex-direction: column; align-items: stretch; }
+  .guide-cta .btn { width: 100%; }
   .team-links .btn { flex: 1 1 auto; }
 
   .footer-row { flex-direction: column; align-items: flex-start; }

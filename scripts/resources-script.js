@@ -1,43 +1,126 @@
-/* ===================== [LATEST-JS] =====================
-   Builds the "Latest added" strip by cloning any card in the
-   main grid marked data-latest="true" — so you only ever edit
-   a resource in one place. Toggle that attribute on a card in
-   resources.html's [RESOURCE-GRID] to feature or unfeature it. */
-const latestBlock = document.getElementById("latest-block");
-const latestStrip = document.getElementById("latest-strip");
-const latestSource = document.querySelectorAll('#resource-grid [data-latest="true"]');
-
-if (latestSource.length === 0) {
-  latestBlock.hidden = true;
-} else {
-  latestSource.forEach(card => {
-    const clone = card.cloneNode(true);
-    clone.classList.add("latest-card");
-    latestStrip.appendChild(clone);
-  });
-}
-
 /* ===================== [SEARCH-JS] =====================
-   Live-filters the cards in #resource-grid as the person
-   types, matching against each card's visible text plus its
-   data-tags attribute. Shows #no-results when nothing matches. */
-const searchInput = document.getElementById("resource-search");
-const resourceCards = document.querySelectorAll("#resource-grid .resource-card");
-const noResults = document.getElementById("no-results");
-const noResultsQuery = document.getElementById("no-results-query");
+   While the search box is empty: [CATEGORIES] (the normal
+   categorized browse view) is shown, [SEARCH-RESULTS] is hidden.
 
-searchInput.addEventListener("input", () => {
-  const query = searchInput.value.trim().toLowerCase();
-  let visibleCount = 0;
+   While the search box has text: [CATEGORIES] is hidden, and
+   [SEARCH-RESULTS] is filled with clones of every matching card,
+   in one flat grid — no category headings, no non-matching cards.
+   A card matches if every word you've typed appears somewhere in
+   its title, description, or data-tags (any order, so "tool math"
+   and "math tool" both work).
 
-  resourceCards.forEach(card => {
-    const haystack = (card.textContent + " " + (card.dataset.tags || "")).toLowerCase();
-    const matches = haystack.includes(query);
-    card.hidden = !matches;
-    if (matches) visibleCount++;
+   Also handles: a clear (×) button and a live "X of Y shown" count
+   (both self-installed into the search bar if not already present),
+   debounced input, and keyboard shortcuts ("/" to focus the search
+   box from anywhere, Escape to clear it). */
+(function setUpResourceSearch() {
+  const searchBar = document.querySelector(".search-bar");
+  const searchInput = document.getElementById("resource-search");
+  const categoriesWrap = document.getElementById("resource-categories");
+  const searchResults = document.getElementById("search-results");
+  const noResults = document.getElementById("no-results");
+  const noResultsQuery = document.getElementById("no-results-query");
+
+  if (!searchBar || !searchInput || !categoriesWrap || !searchResults) return;
+
+  const allCards = document.querySelectorAll("#resource-categories .resource-card");
+
+  function normalize(str) {
+    return (str || "").toLowerCase().trim();
+  }
+
+  // Every word in the query must appear somewhere in the haystack.
+  function matchesQuery(haystack, query) {
+    if (!query) return true;
+    const words = query.split(/\s+/).filter(Boolean);
+    return words.every(word => haystack.includes(word));
+  }
+
+  function debounce(fn, delay) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  let clearBtn = document.getElementById("resource-search-clear");
+  if (!clearBtn) {
+    clearBtn = document.createElement("button");
+    clearBtn.id = "resource-search-clear";
+    clearBtn.type = "button";
+    clearBtn.className = "search-clear";
+    clearBtn.setAttribute("aria-label", "Clear search");
+    clearBtn.textContent = "×";
+    clearBtn.hidden = true;
+    searchBar.appendChild(clearBtn);
+  }
+
+  let resultCount = document.getElementById("resource-count");
+  if (!resultCount) {
+    resultCount = document.createElement("p");
+    resultCount.id = "resource-count";
+    resultCount.className = "search-count";
+    resultCount.setAttribute("aria-live", "polite");
+    searchBar.insertAdjacentElement("afterend", resultCount);
+  }
+
+  function runFilter() {
+    const query = normalize(searchInput.value);
+
+    // Empty box — show the normal categorized browse view, nothing else to do
+    if (!query) {
+      categoriesWrap.hidden = false;
+      searchResults.hidden = true;
+      searchResults.innerHTML = "";
+      if (noResults) noResults.hidden = true;
+      clearBtn.hidden = true;
+      resultCount.textContent = "";
+      return;
+    }
+
+    // Searching — hide the categorized view, build a flat grid of matches only
+    categoriesWrap.hidden = true;
+
+    const matches = [];
+    allCards.forEach(card => {
+      const haystack = normalize(card.textContent + " " + (card.dataset.tags || ""));
+      if (matchesQuery(haystack, query)) matches.push(card);
+    });
+
+    searchResults.innerHTML = "";
+    matches.forEach(card => searchResults.appendChild(card.cloneNode(true)));
+
+    searchResults.hidden = matches.length === 0;
+    if (noResults) noResults.hidden = matches.length !== 0;
+    if (noResultsQuery) noResultsQuery.textContent = searchInput.value.trim();
+
+    clearBtn.hidden = false;
+    resultCount.textContent = `${matches.length} of ${allCards.length} shown`;
+  }
+
+  function clearSearch() {
+    searchInput.value = "";
+    runFilter();
+    searchInput.focus();
+  }
+
+  const debouncedFilter = debounce(runFilter, 120);
+  searchInput.addEventListener("input", debouncedFilter);
+  clearBtn.addEventListener("click", clearSearch);
+
+  document.addEventListener("keydown", (e) => {
+    const isTyping = ["INPUT", "TEXTAREA"].includes(document.activeElement.tagName);
+
+    if (e.key === "/" && !isTyping) {
+      e.preventDefault();
+      searchInput.focus();
+    }
+
+    if (e.key === "Escape" && document.activeElement === searchInput) {
+      clearSearch();
+    }
   });
 
-  const showNoResults = query.length > 0 && visibleCount === 0;
-  noResults.hidden = !showNoResults;
-  noResultsQuery.textContent = searchInput.value.trim();
-});
+  runFilter(); // in case the box already has a value (e.g. back/forward navigation)
+})();
