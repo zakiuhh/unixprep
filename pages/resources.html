@@ -1,16 +1,16 @@
 <!--
-  UNI x PREP — Resources Page
+  UNI x PREP - Resources Page
   ==========================
-  Lives at pages/resources.html — same folder as about.html, one level
+  Lives at pages/resources.html - same folder as about.html, one level
   below index.html and the shared styles/ and scripts/ folders, so
   relative paths use "../" the same way about.html does.
 
   [NAV]              Same sticky nav as index.html/about.html.
-  [NOTICE]           Small "still growing" banner — remove once you feel
+  [NOTICE]           Small "still growing" banner - remove once you feel
                       the list is substantial enough not to need it.
   [SEARCH]           Search bar. While you're typing, [CATEGORIES] below
                       is hidden and [SEARCH-RESULTS] shows a flat grid
-                      of just the matching cards — no category grouping,
+                      of just the matching cards - no category grouping,
                       no non-matching cards mixed in. Clearing the box
                       switches back to the normal categorized view.
                       Logic in resources-script.js.
@@ -23,7 +23,7 @@
                       add a resource. Fill in data-tags (comma-separated,
                       feeds search) and data-added (YYYY-MM-DD, shown on
                       the card). Add data-latest="true" to a card to
-                      give it a small "Latest Added" corner badge — pure
+                      give it a small "Latest Added" corner badge - pure
                       CSS, no JS involved, so it still shows up correctly
                       if that card gets cloned into a search result.
   [SEARCH-RESULTS]   Empty by default; resources-script.js fills it with
@@ -40,10 +40,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resources — UNI x Prep</title>
-  <meta name="description" content="A searchable list of extra resources for entry test prep — videos, courses, tools, and communities.">
-  <meta property="og:title" content="Resources — UNI x Prep">
-  <meta property="og:description" content="A searchable list of extra resources for entry test prep — videos, courses, tools, and communities.">
+  <title>Resources - UNI x Prep</title>
+  <meta name="description" content="A searchable list of extra resources for entry test prep - videos, courses, tools, and communities.">
+  <meta property="og:title" content="Resources - UNI x Prep">
+  <meta property="og:description" content="A searchable list of extra resources for entry test prep - videos, courses, tools, and communities.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#F1F3EF">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
@@ -94,22 +94,22 @@
       <div class="section-head">
         <div class="eyebrow">Beyond the repo</div>
         <h1>Resource Links</h1>
-        <p>Videos, courses, tools, and communities worth bookmarking — searchable so you don't have to scroll forever.</p>
+        <p>Videos, courses, tools, and communities worth bookmarking - searchable so you don't have to scroll forever.</p>
       </div>
 
-      <!-- ===================== NOTICE [NOTICE] — remove once the list feels substantial ===================== -->
+      <!-- ===================== NOTICE [NOTICE] - remove once the list feels substantial ===================== -->
       <div class="notice-banner">
         <span class="notice-dot"></span>
-        <p>This list is growing — new resources added regularly.</p>
+        <p>This list is growing - new resources added regularly.</p>
       </div>
 
       <!-- ===================== SEARCH [SEARCH] ===================== -->
       <div class="search-bar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="search" id="resource-search" placeholder="Search resources — try “math” or “tool”" aria-label="Search resources">
+        <input type="search" id="resource-search" placeholder="Search resources - try “math” or “tool”" aria-label="Search resources">
       </div>
 
-      <!-- ===================== CATEGORIES [CATEGORIES] — static cards, edit directly ===================== -->
+      <!-- ===================== CATEGORIES [CATEGORIES] - static cards, edit directly ===================== -->
       <div class="resource-categories" id="resource-categories">
 
         <!-- Category: copy this whole block to add a new category -->
@@ -305,7 +305,7 @@
 
       </div>
 
-      <!-- ===================== SEARCH RESULTS [SEARCH-RESULTS] — auto-built while searching ===================== -->
+      <!-- ===================== SEARCH RESULTS [SEARCH-RESULTS] - auto-built while searching ===================== -->
       <div class="resource-grid" id="search-results" hidden></div>
 
       <p class="no-results" id="no-results" hidden>No resources match "<span id="no-results-query"></span>". Try a different search.</p>
